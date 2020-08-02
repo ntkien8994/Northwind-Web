@@ -1,0 +1,340 @@
+@import '~antd/dist/antd.css';
+#root {
+  height: 100%;
+}
+#root>div {
+  height: 100%;
+}
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.bg-white{
+  background-color: white;
+}
+.ant-breadcrumb{
+  padding-left: 20px !important;
+  height: 40px;
+  line-height: 40px !important;
+  border-bottom: 1px solid #ddd;
+}
+.app-body{
+  height: calc(100vh - 139px) !important;
+  overflow: auto !important;
+}
+.app-body .ant-table-wrapper{
+  height: calc(100vh - 179px) !important;
+  overflow: auto !important;
+}
+.app-search .ant-table-wrapper{
+  height: calc(100vh - 234px) !important;
+  overflow: auto !important;
+}
+.app-search-toolbar .ant-table-wrapper{
+  height: calc(100vh - 274px) !important;
+  overflow: auto !important;
+}
+.app-search-toolbar1 .ant-table-wrapper{
+  height: calc(100vh - 242px) !important;
+  overflow: auto !important;
+}
+.ant-menu-item{
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+.ant-layout-footer {
+  padding: 0px 20px !important;
+  color: rgba(0,0,0,0.65);
+  font-size: 14px;
+  background: #f0f2f5;
+  height: 47px !important;
+  line-height: 47px;
+  border-top: 1px solid #ddd;
+}
+.ant-layout-footer .ml-auto{
+  float: right;
+}
+
+/* .ant-menu-inline-collapsed{
+  width: 60px !important;
+}
+.ant-menu-inline-collapsed .ant-menu-item{
+  margin-left: -10px !important;
+} */
+/* .ant-menu-vertical .ant-menu-submenu, .ant-menu-vertical-left .ant-menu-submenu, .ant-menu-vertical-right .ant-menu-submenu, .ant-menu-inline .ant-menu-submenu {
+  margin-left: -10px;
+} */
+
+.react-resizable {
+  position: relative;
+  background-clip: padding-box;
+}
+
+.react-resizable-handle {
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  bottom: 0;
+  right: -5px;
+  cursor: col-resize;
+  z-index: 1;
+}
+.ant-pagination-total-text{
+  height: 24px !important;
+  line-height: 24px !important;
+  font-weight: 500 !important;
+}
+.ant-table-thead th{
+  /* background-color: #FAFAFA !important; */
+  background-color: #1890ff !important;
+  color: white !important;
+}
+
+
+/* tool bar list */
+.app-toobar-list{
+  background-color: white;
+  height: 40px;
+  margin-left: 0px !important;
+  margin-bottom: 0px !important;
+  padding-left: 10px;
+}
+.app-toobar-list li{
+  display: inline;
+  list-style: none;
+  font-weight: 500;
+}
+.app-toobar-list li a{
+  display: inline;
+  padding: 4px 10px;
+  color: #20a8d8 !important;
+  line-height: 40px;
+}
+.app-toobar-list li a:hover{
+  cursor: pointer;
+}
+.app-toobar-list .red{
+  color: red;
+}
+.colorred{
+  color: red;
+}
+.app-toobar-list .green{
+  color: #379e00;
+}
+.app-toobar-list .blue{
+  color: #20a8d8;
+}
+.app-toobar-list .bold{
+  font-weight: bold;
+}
+
+.ant-form-item{
+  margin-bottom: 10px !important;
+}
+
+
+.header-wrapper {
+  position: relative;
+  padding: 0;
+  height: 50px;
+  line-height: 50px;
+  background:#001529 url('./styles/img/patterm_h.png') no-repeat top right; 
+  background-color:#001529 ;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+}
+
+.header-collapsed {
+  padding: 22px 24px;
+  height: 50px;
+  cursor: pointer;
+  transition: all .3s,padding 0s;
+  font-size: 20px;
+}
+
+.header-collapsed:hover, .header-dropdown-link:hover {
+  background-color: rgba(0, 0, 0, .025);
+}
+
+.header-user-info {
+  float: right;
+  margin-right: 20px;
+}
+
+.header-dropdown-link {
+  display: inline-block;
+  padding: 0 12px;
+  height: 100%;
+  text-decoration: none;
+  color: white;
+  transition: all .3s;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.header-dropdown-link i:first-child {
+  font-size: 20px !important;
+}
+
+.textbanner03 {
+  color: white !important;
+  text-shadow: 2px 2px 4px #bdbebe;
+  font-size: 28px;
+  font-family: Impact,Haettenschweiler,Arial Narrow Bold,sans-serif;
+  padding: 0 10px 0 8px;
+  float: left;
+} 
+.center50{
+  width: 50px;
+  height: 50px;
+  margin: 20px auto;
+}
+.app-select{
+  padding-right: 20px;
+}
+.app-body .app-select .ant-table-wrapper{
+  height: calc(100vh - 240px) !important;
+  overflow: auto !important;
+}
+.ant-modal-header {
+  padding: 10px 24px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 2px 2px 0 0;
+}
+.ant-modal-close-x {
+  display: block;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 40px;
+  text-align: center;
+  text-transform: none;
+  text-rendering: auto;
+}
+.app-modal-form .ant-modal-body{
+  padding-bottom: 0px !important;
+}
+.ant-modal-footer {
+  padding: 10px 16px;
+  text-align: right;
+  background: #f6f5f5;
+  border-top: 1px solid #d4d2d2;
+  border-radius: 0 0 2px 2px;
+}
+
+/* List */
+.app-function-box{
+  height: calc(100vh - 190px) !important;
+  overflow-y: auto !important;
+}
+.app-function-box .ant-tabs-content{
+  height: calc(100vh - 190px) !important;
+  padding-top: 20px;
+  overflow-y: auto !important;
+}
+.fn-toolbar{
+  padding-left: 10px;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+  clear: both;
+  display: block;
+  line-height: 50px;
+}
+
+
+/* Detail */
+.app-function-box-detail{
+  height: calc(100vh - 250px) !important;
+  overflow-y: auto !important;
+}
+.app-function-box-detail .ant-tabs-content{
+  height: calc(100vh - 250px) !important;
+  padding-top: 20px;
+  overflow-y: auto !important;
+}
+.fn-toolbar-detail{
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+  clear: both;
+  display: block;
+}
+.ant-modal-close{
+  color: white !important;
+}
+.ant-modal-close:hover{
+  color: white !important;
+}
+.ant-modal-header{
+  background-color: #1890ff !important;
+}
+.ant-modal-title{
+  color: white !important;
+}
+.ant-upload{
+  width: 100%;
+}
+
+.ant-form-item-has-error .ant-form-item-explain{
+  font-size: 12px !important;
+}
+.label-form{
+  line-height: 30px;
+}
+.grd-command {
+  color: #52c41a;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+  display: block;
+  width: 76px;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+.grd-command:hover{
+  color: #52c41a;
+  border: 1px solid #52c41a;
+}
+.app-wrap-grid-detail{
+  height: 192px;
+  overflow: auto;
+  border: 1px solid #ddd;
+}
+.bold{
+  font-weight: 500;
+}
+.app-search-panel{
+  padding: 10px 10px 0px 10px;
+}
+.lbl-form{
+  line-height: 30px;
+}
+.ant-form-item-label {
+   text-align: left !important; 
+}
