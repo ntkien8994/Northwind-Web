@@ -118,12 +118,13 @@ class BaseList extends BaseComponent {
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: "question-circle", sortOrder: 4 },
         ]);
     }
-    loadData() {
+    loadData(pagination,isloading, isbusy,searchObject) {
         var me = this;
         var param = {
-            isloading: true,
-            isbusy :false,
-            pagination: me.props.pagination
+            isloading,
+            isbusy,
+            pagination,
+            searchObject
         }
         var customparam =me.getCustomParam(param);
         if(customparam){
@@ -133,7 +134,11 @@ class BaseList extends BaseComponent {
     }
     refresh(){
         var me=this;
-        me.props.refreshData();
+        var pagination = me.props.pagination,
+            isloading = false,
+            isbusy = true,
+            searchObject = me.props.searchObject;
+        me.apicall(() => me.loadData(pagination,isloading,isbusy,searchObject));
     }
     getCustomParam(){
         return null;
@@ -146,11 +151,12 @@ class BaseList extends BaseComponent {
     }
     componentDidMount() {
         var me = this;
-        var param = {
-            pagination: me.props.pagination,
-            
-        }
-        me.apicall(() => me.loadData());
+        var pagination = me.props.pagination,
+            isloading = true,
+            isbusy = false,
+            searchObject = null;
+
+        me.apicall(() => me.loadData(pagination,isloading,isbusy,searchObject));
     }
     render() {
         var me = this;

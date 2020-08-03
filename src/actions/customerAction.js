@@ -5,11 +5,14 @@ export function loadData(param){
         param
     }
 }
-export function loadComplete(data){
+export function loadComplete(param){
+    var {data,pagination,searchObject} = param;
     return {
         type:Constant.CustomerAction.LOAD_COMPLETE,
         isloading: false,
         isbusy:false,
-        data
+        data,
+        pagination,
+        searchObject
     }
 }

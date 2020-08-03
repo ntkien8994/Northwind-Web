@@ -10,7 +10,7 @@ function* customerSaga() {
 function* loadData(action) {
     debugger
     var { pagination } = action.param;
-    var skip = pagination.current * pagination.pageSize;
+    var skip = (pagination.current-1) * pagination.pageSize;
     var param = {
         Skip: skip,
         Take: pagination.pageSize,
@@ -20,8 +20,13 @@ function* loadData(action) {
     var result = yield call(() => api.paging(param));
 
     var data = JSON.parse(result.data.data);
+    pagination.total = data.TotalCount;
     debugger
-    yield put(loadComplete(data));
+    yield put(loadComplete({
+        data,
+        pagination,
+        searchObject: action.searchObject
+    }));
 }
 
 

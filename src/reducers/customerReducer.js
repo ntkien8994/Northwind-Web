@@ -23,8 +23,8 @@ export function customers(state = initState, action) {
             result.data = action.data.Data;
             result.isloading = false;
             result.isbusy = false;
-            result.pagination = action.param.pagination;
-            result.searchObject = action.param.searchObject
+            result.pagination = action.pagination;
+            result.searchObject = action.searchObject
             break;
     }
     return result;
