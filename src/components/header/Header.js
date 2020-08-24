@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Dropdown, Menu } from 'antd';
-import { Icon } from '@ant-design/compatible';
+// import { Icon } from '@ant-design/compatible';
 import GeneralForm from '../base/GeneralForm';
-import { LoginOutlined } from '@ant-design/icons';
+import { LoginOutlined,LogoutOutlined,UserOutlined,DownOutlined } from '@ant-design/icons';
 
 import * as Constant from '../../utility/Constant';
 var jwtDecode = require('jwt-decode');
@@ -96,7 +96,7 @@ class Header extends GeneralForm {
         return (
             <Menu style={{ width: 150 }} >
                 <Menu.Item key="1" onClick={() => me.signOut()} >
-                    <Icon type="logout" />&nbsp;Đăng xuất
+                    <LogoutOutlined/>&nbsp;Đăng xuất
                 </Menu.Item>
             </Menu>
         )
@@ -133,7 +133,7 @@ class Header extends GeneralForm {
 
         return (
             <div className='header-wrapper'>
-                <div class="textbanner03">NORTH WIND</div>
+                <div className="textbanner03">NORTH WIND</div>
                 <div className='header-user-info'>
                     {
                         me.state.isbusy ? 
@@ -143,7 +143,7 @@ class Header extends GeneralForm {
                             <>                
                                 <Dropdown overlay={me.getmenu()} placement="bottomRight">
                                     <span className='header-dropdown-link'>
-                                        <Icon type="user" /> <strong>{displaytext}</strong> <Icon type="down" />
+                                        <UserOutlined /> <strong>{displaytext}</strong> <DownOutlined />
                                     </span>
                                 </Dropdown>
                             </> : 
@@ -154,50 +154,6 @@ class Header extends GeneralForm {
                 </div>
             </div>
         );
-        // if (me.state.isbusy) {
-        //     return me.getReactLoading({ type: 'spin', color: '#20a8d8', height: '30px', width: '30px' });
-        // }
-
-        // if (me.state.isAuthenticate) {
-        //     var charactor = me.state.userName.substring(0, 1);
-        //     var displaytext = me.state.userName;
-        //     if (me.state.firstname && me.state.lastname) {
-        //         displaytext = me.format("{0} {1}", me.state.firstname, me.state.lastname);
-        //         charactor = me.state.firstname.substring(0, 1);
-        //     }
-        //     else if (me.state.firstname) {
-        //         displaytext = me.state.firstname;
-        //         charactor = me.state.firstname.substring(0, 1);
-        //     }
-        //     else if (me.state.lastname) {
-        //         displaytext = me.state.lastname;
-        //         charactor = me.state.lastname.substring(0, 1);
-        //     }
-        //     return (
-        //         <div className='header-wrapper'>
-        //             <div class="textbanner03">CMCLIS</div>
-        //             <div className='header-user-info'>
-        //                 <Dropdown overlay={me.getmenu()} placement="bottomRight">
-        //                     <span className='header-dropdown-link'>
-        //                         <Icon type="user" /> <strong>{displaytext}</strong> <Icon type="down" />
-        //                     </span>
-        //                 </Dropdown>
-        //             </div>
-        //         </div>
-        //     )
-        // }
-        // else {
-        //     return (
-        //         <div className='header-wrapper'>
-        //             <div class="textbanner03">CMCLIS</div>
-        //             <div className='header-user-info'>
-        //                 <Button onClick={me.onLoginClick} type="primary" shape="round" icon={<LoginOutlined />}>
-        //                     Đăng nhập
-        //     </Button>
-        //             </div>
-        //         </div>
-        //     );
-        // }
     }
 }
 

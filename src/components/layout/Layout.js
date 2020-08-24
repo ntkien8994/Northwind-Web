@@ -155,7 +155,7 @@ function ProLayout(props) {
           </div>
           <Footer>
             <span><a href="#">North Wind</a> © 2020</span>
-            <span class="ml-auto">Powered by <a href="#">ntk</a></span>
+            <span className="ml-auto">Powered by <a href="#">ntk</a></span>
           </Footer>
         </Layout>
       </Layout>

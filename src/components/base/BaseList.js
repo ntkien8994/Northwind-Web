@@ -2,67 +2,31 @@ import React from 'react';
 import BaseToolBar from './BaseToolBar';
 import BaseDetail from './BaseDetail';
 import * as Constant from '../../utility/Constant';
-import { Table } from 'antd';
+import { Pagination } from 'antd';
 import BaseComponent from './BaseComponent';
-import { Resizable } from 'react-resizable';
-import axios from 'axios';
+import GridTable from '../controls/GridTable';
 
 class BaseList extends BaseComponent {
-    //resize column
-    // components = () => {
-    //     var me = this;
-    //     return {
-    //         header: {
-    //             cell: me.ResizeableTitle,
-    //         }
-    //     }
-    // };
-    // ResizeableTitle = props => {
-    //     const { onResize, width, ...restProps } = props;
-
-    //     if (!width) {
-    //         return <th {...restProps} />;
-    //     }
-
-    //     return (
-    //         <Resizable
-    //             width={width}
-    //             height={0}
-    //             handle={
-    //                 <span
-    //                     className="react-resizable-handle"
-    //                     onClick={e => {
-    //                         e.stopPropagation();
-    //                     }}
-    //                 />
-    //             }
-    //             onResize={onResize}
-    //             draggableOpts={{ enableUserSelectHack: false }}
-    //         >
-    //             <th {...restProps} />
-    //         </Resizable>
-    //     );
-    // };
-    // handleResize = index => (e, { size }) => {
-    //     this.setState(({ columns }) => {
-    //         const nextColumns = [...columns];
-    //         nextColumns[index] = {
-    //             ...nextColumns[index],
-    //             width: size.width,
-    //         };
-    //         return { columns: nextColumns };
-    //     });
-    // };
-    //paging
+    //paging sau này để filter
     handleTableChange = (pagination, filters, sorter) => {
         var me = this;
-        me.props.paging(pagination, filters,sorter)
+        me.loadData(pagination, false, true, me.props.searchObject);
+    };
+    //paging
+    onPaginationChange = (current, pageSize) => {
+        var me = this;
+        var pagination = { ...me.props.pagination };
+        pagination.current = current;
+        me.loadData(pagination, false, true, me.props.searchObject);
     };
     toolbar_Click = (commandName) => {
-        var me=this;
+        var me = this;
         switch (commandName) {
             case Constant.commandName.add:
-                me.showFormDetail(Constant.editMode.add, me.state.id);
+                // me.showFormDetail(Constant.editMode.add, me.state.id);
+                me.props.showFormInfo({
+                    editMode:Constant.editMode.add
+                });
                 break;
             case Constant.commandName.dupplicate:
                 me.showFormDetail(Constant.editMode.dupplicate, me.state.id);
@@ -80,7 +44,6 @@ class BaseList extends BaseComponent {
                     return;
                 }
                 me.state.contentConfirm = "Bạn có chắc chắn muốn xóa bản ghi này không?";
-                me.setState({ showconfirm: true });
                 break;
             case Constant.commandName.refresh:
                 me.refresh();
@@ -118,7 +81,7 @@ class BaseList extends BaseComponent {
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: "question-circle", sortOrder: 4 },
         ]);
     }
-    loadData(pagination,isloading, isbusy,searchObject) {
+    loadData(pagination, isloading, isbusy, searchObject) {
         var me = this;
         var param = {
             isloading,
@@ -126,27 +89,30 @@ class BaseList extends BaseComponent {
             pagination,
             searchObject
         }
-        var customparam =me.getCustomParam(param);
-        if(customparam){
+        var customparam = me.getCustomParam(param);
+        if (customparam) {
             param = customparam
         }
         me.props.loadData(param);
     }
-    refresh(){
-        var me=this;
+    refresh() {
+        var me = this;
         var pagination = me.props.pagination,
             isloading = false,
             isbusy = true,
             searchObject = me.props.searchObject;
-        me.apicall(() => me.loadData(pagination,isloading,isbusy,searchObject));
+        me.apicall(() => me.loadData(pagination, isloading, isbusy, searchObject));
     }
-    getCustomParam(){
+    getCustomParam() {
         return null;
     }
     getSearchPanel() {
         return null;
     }
-    getColumns(){
+    getFormDetail(propsFormDetail) {
+        return null;
+    }
+    getColumns() {
         return []
     }
     componentDidMount() {
@@ -156,10 +122,26 @@ class BaseList extends BaseComponent {
             isbusy = false,
             searchObject = null;
 
-        me.apicall(() => me.loadData(pagination,isloading,isbusy,searchObject));
+        me.apicall(() => me.loadData(pagination, isloading, isbusy, searchObject));
+    }
+    window_resize = () => {
+        var me = this;
+        me.forceUpdate();
+    }
+    getScrollHeight(toolbarheight) {
+        var elements = document.getElementsByClassName("app-body");
+        var scrollheight = 500;
+        var headerGridHeight = 39;
+        var pagingHeight = 45.5;
+        if (elements && elements.length > 0) {
+
+            scrollheight = elements[0].scrollHeight - toolbarheight - headerGridHeight - pagingHeight;
+        }
+        return scrollheight
     }
     render() {
         var me = this;
+        window.addEventListener('resize', me.window_resize);
         //nếu chưa load thì hiển thị màn hình loading
         if (me.props.isloading) {
             return (
@@ -169,41 +151,52 @@ class BaseList extends BaseComponent {
                     }
                 </div>)
         }
-        var className = 'app-search-toolbar';
-        // if(me.state.classGridName){
-        //     className=me.state.classGridName;
-        // }
+
         var toobarConfig = me.getToolBarConfig();
+        var scrollheight = me.getScrollHeight(toobarConfig ? 40 : 0);
 
-        // var columnsresize = me.state.columns.map((col, index) => ({
-        //     ...col,
-        //     onHeaderCell: column => ({
-        //         width: column.width,
-        //         onResize: me.handleResize(index),
-        //     }),
-        // }));
-
-        // var elements = document.getElementsByClassName("app-body");
-        // var scrollheight = 430;
-        // if (elements && elements.length > 0) {
-        //     scrollheight = elements[0].scrollHeight - 155;
-        // }
         var columns = me.getColumns();
+        var key = me.props.key ? me.props.key : me.props.entity + "Id";
+        var { current, pageSize, total } = me.props.pagination;
+        var propsTable = {
+            rkey: key,
+            scrollheight,
+            columns,
+            isbusy: me.props.isbusy,
+            data: me.props.data
+        }
+
+        
+        var propsFormDetail = {
+            showDetail: me.props.showDetail,
+            loadingDetail:me.props.loadingDetail
+        }
+        var detailForm = me.getFormDetail(propsFormDetail);
         return (
             <React.Fragment>
                 {me.getSearchPanel()}
-                <BaseToolBar config={toobarConfig} clickCallBack={me.toolbar_Click} />
-                <div className={className}>
-                    <Table
-                        size="small"
-                        bordered
-                        // defaultExpandedRowKeys={me.props.expandkeys}
-                        loading={me.props.isbusy}
-                        pagination={me.props.pagination}
-                        columns={columns}
-                        onChange={me.handleTableChange}
-                        dataSource={me.props.data} />
+                {
+                    toobarConfig ? <BaseToolBar config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
+                }
+                <div className='app-search-toolbar'>
+                    <GridTable
+                        {...propsTable} />
                 </div>
+                <div className='box-pagination'>
+                    <Pagination
+                        size="small"
+                        showSizeChanger={true}
+                        current={current}
+                        total={total}
+                        pageSize={pageSize}
+                        onChange={me.onPaginationChange}
+                        showQuickJumper
+                        showTotal={total => `Tổng số ${total} bản ghi`}
+                    />
+                </div>
+                {
+                    detailForm ? detailForm : null
+                }
             </React.Fragment>
         );
     }

@@ -46,6 +46,7 @@
 .app-body{
   height: calc(100vh - 139px) !important;
   overflow: auto !important;
+  position: relative;
 }
 .app-body .ant-table-wrapper{
   height: calc(100vh - 179px) !important;
@@ -55,10 +56,10 @@
   height: calc(100vh - 234px) !important;
   overflow: auto !important;
 }
-.app-search-toolbar .ant-table-wrapper{
+/* .app-search-toolbar .ant-table-wrapper{
   height: calc(100vh - 274px) !important;
   overflow: auto !important;
-}
+} */
 .app-search-toolbar1 .ant-table-wrapper{
   height: calc(100vh - 242px) !important;
   overflow: auto !important;
@@ -102,6 +103,7 @@
   bottom: 0;
   right: -5px;
   cursor: col-resize;
+  
   z-index: 1;
 }
 .ant-pagination-total-text{
@@ -337,4 +339,31 @@
 }
 .ant-form-item-label {
    text-align: left !important; 
+}
+.box-pagination{
+  display: block;
+  position: absolute;
+  bottom: 0;
+  padding: 10px 10px;
+  width: 100%;
+  border-top: 1px solid #ddd ;
+}
+.box-pagination .ant-pagination{
+  float: right;
+}
+.ant-table-wrapper .ant-table-body{
+  overflow-y: auto !important;
+}
+/* .grid-table-selected-row{
+  background-color: red;
+}
+.grid-table-selected-row:hover{
+  background-color: red !important;
+} */
+.ant-table-tbody > tr.grid-table-selected-row > td {
+  background: #f7ece3;
+  border-color: rgba(0, 0, 0, 0.03);
+}
+.ant-table-tbody > tr.grid-table-selected-row:hover > td {
+  background:#f7ece3;
 }

@@ -5,11 +5,15 @@ const initState = {
     isbusy: false,
     pagination: {
         current: 1,
-        pageSize: 12,
+        pageSize: 25,
         total: 0
     },
-    searchObject:null,
-    entity: "Customer"
+    searchObject: null,
+    entity: 'Customer',
+
+    loadingDetail: false,
+    showDetail: false,
+    masterData: null,
 }
 export function customers(state = initState, action) {
     var result = { ...state };
@@ -19,12 +23,15 @@ export function customers(state = initState, action) {
             result.isbusy = action.param.isbusy;
             break;
         case Constant.CustomerAction.LOAD_COMPLETE:
-            debugger
             result.data = action.data.Data;
             result.isloading = false;
             result.isbusy = false;
             result.pagination = action.pagination;
             result.searchObject = action.searchObject
+            break;
+        case Constant.CustomerAction.SHOW_FORM:
+            result.loadingDetail = true;
+            result.showDetail = true;
             break;
     }
     return result;
