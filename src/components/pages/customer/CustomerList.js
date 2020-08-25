@@ -23,14 +23,14 @@ class CustomerList extends BaseList {
                 title: 'Customer Code',
                 dataIndex: 'CustomerCode',
                 key: 'CustomerCode',
-                width: 300,
+                width: 150,
                 ellipsis: true,
             },
             {
                 title: 'Name',
                 dataIndex: 'CustomerName',
                 key: 'CustomerName',
-                width: 500,
+                width: 250,
                 ellipsis: true,
             },
             {

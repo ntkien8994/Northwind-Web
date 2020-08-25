@@ -93,33 +93,43 @@ class GridTable extends React.Component {
     setSelectedRow(rowId) {
         const selectedClass = 'grid-table-selected-row';
         var rows = document.querySelectorAll('.ant-table-row');
-        if(rows &&rows.length>0){
+        if (rows && rows.length > 0) {
             rows.forEach(element => {
                 element.classList.remove(selectedClass);
             });
         }
-        var element = document.querySelectorAll("[data-row-key='" + rowId + "']");
-        if (element && element.length > 0) {
-            element[0].classList.add(selectedClass);
+        var element = document.querySelector("[data-row-key='" + rowId + "']");
+        if (element) {
+            element.classList.add(selectedClass);
         }
     }
-    componentDidMount(){
-        var me=this;
-        if(me.props.data && me.props.data.length>0){
+    componentDidMount() {
+        var me = this;
+        if (me.props.data && me.props.data.length > 0) {
             var selectedId = me.props.data[0][me.props.rkey];
             me.setSelectedRow(selectedId);
         }
     }
-    componentDidUpdate(){
-        var me=this;
-        if(me.props.data && me.props.data.length>0){
+    componentDidUpdate() {
+        var me = this;
+        if (me.props.data && me.props.data.length > 0) {
             var selectedId = me.props.data[0][me.props.rkey];
             me.setSelectedRow(selectedId);
+        }
+    }
+    scrollToTop(){
+        var tableBody = document.querySelector('.ant-table-body');
+        if(tableBody ){
+            tableBody.scrollTop = 0; 
         }
     }
     render() {
         var me = this;
         var props = me.props;
+        var scroll = (props.scrollheight && props.scrollheight) > 0 ? {
+            x: false,
+            y: props.scrollheight
+        } : null;
         var columnsresize = me.state.columns.map((col, index) => ({
             ...col,
             onHeaderCell: column => ({
@@ -127,18 +137,19 @@ class GridTable extends React.Component {
                 onResize: me.handleResize(index),
             }),
         }));
+        me.scrollToTop();
         return (
             <Table
                 size="small"
                 onRow={(record, rowIndex) => {
                     return {
-                        onClick: event => { 
+                        onClick: event => {
                             me.setSelectedRow(record[props.rkey])
                         }, // click row
-                        onDoubleClick: event => { 
+                        onDoubleClick: event => {
                             me.setSelectedRow(record[props.rkey])
                         }, // double click row
-                        onContextMenu: event => { 
+                        onContextMenu: event => {
                             me.setSelectedRow(record[props.rkey])
                         }, // right button click row
                         onMouseEnter: event => { }, // mouse enter row
@@ -148,9 +159,7 @@ class GridTable extends React.Component {
                 bordered
                 rowKey={props.rkey}
                 scroll={
-                    {
-                        y: props.scrollheight
-                    }
+                    scroll
                 }
                 components={components}
                 // defaultExpandedRowKeys={me.props.expandkeys}

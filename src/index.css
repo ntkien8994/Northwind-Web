@@ -352,8 +352,9 @@
   float: right;
 }
 .ant-table-wrapper .ant-table-body{
-  overflow-y: auto !important;
+  overflow: auto !important;
 }
+
 /* .grid-table-selected-row{
   background-color: red;
 }
@@ -366,4 +367,10 @@
 }
 .ant-table-tbody > tr.grid-table-selected-row:hover > td {
   background:#f7ece3;
+}
+.ant-table.ant-table-bordered .ant-table-container{
+  border: 0px !important;
+}
+.ant-table-container .ant-table-content{
+  overflow:  hidden !important;
 }

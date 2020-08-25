@@ -154,7 +154,6 @@ class BaseList extends BaseComponent {
 
         var toobarConfig = me.getToolBarConfig();
         var scrollheight = me.getScrollHeight(toobarConfig ? 40 : 0);
-
         var columns = me.getColumns();
         var key = me.props.key ? me.props.key : me.props.entity + "Id";
         var { current, pageSize, total } = me.props.pagination;
