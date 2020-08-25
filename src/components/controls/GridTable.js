@@ -1,11 +1,7 @@
 import React from 'react';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import { Resizable } from 'react-resizable';
-const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    }
-};
+import Popup from './Popup';
 
 const ResizableTitle = props => {
     const { onResize, width, ...restProps } = props;
@@ -42,7 +38,13 @@ class GridTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            columns: props.columns
+            columns: props.columns,
+            popup: {
+                record: null,
+                showPopup: false,
+                x: 0,
+                y: 0
+            }
         }
     }
     //resize column
@@ -81,7 +83,8 @@ class GridTable extends React.Component {
         );
     };
     handleResize = index => (e, { size }) => {
-        this.setState(({ columns }) => {
+        var me = this;
+        me.setState(({ columns }) => {
             const nextColumns = [...columns];
             nextColumns[index] = {
                 ...nextColumns[index],
@@ -112,15 +115,15 @@ class GridTable extends React.Component {
     }
     componentDidUpdate() {
         var me = this;
-        if (me.props.data && me.props.data.length > 0) {
+        if (me.props.data && me.props.data.length > 0 && !me.state.popup.showPopup) {
             var selectedId = me.props.data[0][me.props.rkey];
             me.setSelectedRow(selectedId);
         }
     }
-    scrollToTop(){
+    scrollToTop() {
         var tableBody = document.querySelector('.ant-table-body');
-        if(tableBody ){
-            tableBody.scrollTop = 0; 
+        if (tableBody) {
+            tableBody.scrollTop = 0;
         }
     }
     render() {
@@ -139,34 +142,54 @@ class GridTable extends React.Component {
         }));
         me.scrollToTop();
         return (
-            <Table
-                size="small"
-                onRow={(record, rowIndex) => {
-                    return {
-                        onClick: event => {
-                            me.setSelectedRow(record[props.rkey])
-                        }, // click row
-                        onDoubleClick: event => {
-                            me.setSelectedRow(record[props.rkey])
-                        }, // double click row
-                        onContextMenu: event => {
-                            me.setSelectedRow(record[props.rkey])
-                        }, // right button click row
-                        onMouseEnter: event => { }, // mouse enter row
-                        onMouseLeave: event => { }, // mouse leave row
-                    };
-                }}
-                bordered
-                rowKey={props.rkey}
-                scroll={
-                    scroll
-                }
-                components={components}
-                // defaultExpandedRowKeys={me.props.expandkeys}
-                loading={props.isbusy}
-                pagination={false}
-                columns={columnsresize}
-                dataSource={props.data} />
+            <div>
+                <Table
+                    size="small"
+                    onRow={(record, rowIndex) => {
+                        return {
+                            onClick: event => {
+                                me.setSelectedRow(record[props.rkey])
+                            }, // click row
+                            onDoubleClick: event => {
+                                me.setSelectedRow(record[props.rkey])
+                            }, // double click row
+                            onContextMenu: event => {
+                                event.preventDefault();
+                                debugger
+                                me.setSelectedRow(record[props.rkey]);
+                                if (!me.state.popup.showPopup) {
+                                    document.addEventListener('click', function onClickOutside() {
+                                        me.setState({ popup: { showPopup: false } })
+                                        document.removeEventListener('click', onClickOutside)
+                                    })
+                                }
+                                var popup = {
+                                    record,
+                                    showPopup: true,
+                                    x: event.clientX,
+                                    y: event.clientY
+                                }
+                                me.setState({
+                                    popup
+                                })
+                            }, // right button click row
+                            onMouseEnter: event => { }, // mouse enter row
+                            onMouseLeave: event => { }, // mouse leave row
+                        };
+                    }}
+                    bordered
+                    rowKey={props.rkey}
+                    scroll={
+                        scroll
+                    }
+                    components={components}
+                    // defaultExpandedRowKeys={me.props.expandkeys}
+                    loading={props.isbusy}
+                    pagination={false}
+                    columns={columnsresize}
+                    dataSource={props.data} />
+                    <Popup {...me.state.popup} />
+            </div>
         )
     }
 }
