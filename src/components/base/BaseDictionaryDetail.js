@@ -2,7 +2,6 @@ import React from 'react';
 import { Modal } from 'antd';
 import BaseComponent from './BaseComponent';
 
-
 class BaseDictionaryDetail extends BaseComponent {
     constructor(props) {
         super(props);
@@ -39,6 +38,7 @@ class BaseDictionaryDetail extends BaseComponent {
     }
     closeForm = (sender) => {
         var me = this;
+        me.props.closeForm();
     }
     submitData(){
         var me=this;

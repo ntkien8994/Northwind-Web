@@ -46,3 +46,14 @@ export function loadInfo(param){
         param
     }
 }
+
+//description: đóng form
+//------------------------------------------------------
+//created by: ntkien 
+//created date: 24.08.2020
+export function closeForm(param){
+    return {
+        type:Constant.CustomerAction.CLOSE_FORM,
+        param
+    }
+}

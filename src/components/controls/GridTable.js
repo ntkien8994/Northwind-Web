@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button } from 'antd';
 import { Resizable } from 'react-resizable';
 import Popup from './Popup';
-
+var isloadData=false;
 const ResizableTitle = props => {
     const { onResize, width, ...restProps } = props;
 
@@ -115,8 +115,10 @@ class GridTable extends React.Component {
     }
     componentDidUpdate() {
         var me = this;
-        if (me.props.data && me.props.data.length > 0 && !me.state.popup.showPopup) {
+        isloadData = me.props.isloadData;
+        if (isloadData && me.props.data && me.props.data.length > 0) {
             var selectedId = me.props.data[0][me.props.rkey];
+            me.scrollToTop();
             me.setSelectedRow(selectedId);
         }
     }
@@ -129,6 +131,7 @@ class GridTable extends React.Component {
     render() {
         var me = this;
         var props = me.props;
+        
         var scroll = (props.scrollheight && props.scrollheight) > 0 ? {
             x: false,
             y: props.scrollheight
@@ -140,7 +143,7 @@ class GridTable extends React.Component {
                 onResize: me.handleResize(index),
             }),
         }));
-        me.scrollToTop();
+        
         return (
             <div>
                 <Table
@@ -155,23 +158,23 @@ class GridTable extends React.Component {
                             }, // double click row
                             onContextMenu: event => {
                                 event.preventDefault();
-                                debugger
-                                me.setSelectedRow(record[props.rkey]);
-                                if (!me.state.popup.showPopup) {
-                                    document.addEventListener('click', function onClickOutside() {
-                                        me.setState({ popup: { showPopup: false } })
-                                        document.removeEventListener('click', onClickOutside)
-                                    })
-                                }
-                                var popup = {
-                                    record,
-                                    showPopup: true,
-                                    x: event.clientX,
-                                    y: event.clientY
-                                }
-                                me.setState({
-                                    popup
-                                })
+                                // debugger
+                                // me.setSelectedRow(record[props.rkey]);
+                                // if (!me.state.popup.showPopup) {
+                                //     document.addEventListener('click', function onClickOutside() {
+                                //         me.setState({ popup: { showPopup: false } })
+                                //         document.removeEventListener('click', onClickOutside)
+                                //     })
+                                // }
+                                // var popup = {
+                                //     record,
+                                //     showPopup: true,
+                                //     x: event.clientX,
+                                //     y: event.clientY
+                                // }
+                                // me.setState({
+                                //     popup
+                                // })
                             }, // right button click row
                             onMouseEnter: event => { }, // mouse enter row
                             onMouseLeave: event => { }, // mouse leave row

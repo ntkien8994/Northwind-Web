@@ -14,6 +14,7 @@ const initState = {
     loadingDetail: false,
     showDetail: false,
     masterData: null,
+    editMode: Constant.editMode.none
 }
 export function customers(state = initState, action) {
     var result = { ...state };
@@ -27,11 +28,16 @@ export function customers(state = initState, action) {
             result.isloading = false;
             result.isbusy = false;
             result.pagination = action.pagination;
-            result.searchObject = action.searchObject
+            result.searchObject = action.searchObject;
             break;
         case Constant.CustomerAction.SHOW_FORM:
             result.loadingDetail = true;
             result.showDetail = true;
+            result.param = action.param;
+            break;
+        case Constant.CustomerAction.CLOSE_FORM:
+            result.showDetail = false;
+            result.param = action.param;
             break;
     }
     return result;

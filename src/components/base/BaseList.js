@@ -162,7 +162,8 @@ class BaseList extends BaseComponent {
             scrollheight,
             columns,
             isbusy: me.props.isbusy,
-            data: me.props.data
+            data: me.props.data,
+            isloadData: true
         }
 
         

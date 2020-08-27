@@ -1,10 +1,23 @@
 import React from 'react';  
 import BaseDictionaryDetail from '../../base/BaseDictionaryDetail';
 import { Modal, Form, Checkbox,Button,Row,Col,Input } from 'antd';
+import {connect} from 'react-redux'
+import {closeForm} from '../../../actions/customerAction';
 //description: Form chi tiết khách hàng
 //-------------------------------------
 //created by: ntkien 
 //created date: 24.08.2020
+
+const mapStateToProps = state => {
+    return {
+        ...state.customers
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        closeForm: (param) => dispatch(closeForm(param))
+    }
+}
 class CustomerDetail extends BaseDictionaryDetail {
     constructor(props) {
         super(props);
@@ -21,11 +34,11 @@ class CustomerDetail extends BaseDictionaryDetail {
                         <Button form="myForm" key="submit" htmlType="submit" type="primary" >
                             Cập nhật
                 </Button>,
-                        <Button key="back" type="primary" danger onClick={me.handleCancel}>
+                        <Button key="back" type="primary" danger onClick={me.closeForm}>
                             Hủy bỏ
                 </Button>,
                     ]}
-                    onCancel={me.handleCancel}
+                    onCancel={me.closeForm}
                     width={500}>
                     <React.Fragment>
                         {
@@ -166,4 +179,4 @@ class CustomerDetail extends BaseDictionaryDetail {
         );
     }
 }
-export default CustomerDetail
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerDetail)
