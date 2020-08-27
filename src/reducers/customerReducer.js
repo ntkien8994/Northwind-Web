@@ -10,6 +10,7 @@ const initState = {
     },
     searchObject: null,
     entity: 'Customer',
+    activeFirstRow: false,
 
     loadingDetail: false,
     showDetail: false,
@@ -29,15 +30,18 @@ export function customers(state = initState, action) {
             result.isbusy = false;
             result.pagination = action.pagination;
             result.searchObject = action.searchObject;
+            result.activeFirstRow=true;
             break;
         case Constant.CustomerAction.SHOW_FORM:
             result.loadingDetail = true;
             result.showDetail = true;
             result.param = action.param;
+            result.activeFirstRow=false;
             break;
         case Constant.CustomerAction.CLOSE_FORM:
             result.showDetail = false;
             result.param = action.param;
+            result.activeFirstRow=false;
             break;
     }
     return result;

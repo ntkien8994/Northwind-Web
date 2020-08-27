@@ -163,7 +163,7 @@ class BaseList extends BaseComponent {
             columns,
             isbusy: me.props.isbusy,
             data: me.props.data,
-            isloadData: true
+            activeFirstRow:me.props.activeFirstRow
         }
 
         
