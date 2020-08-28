@@ -47,8 +47,10 @@ export function loadInfo(param){
     }
 }
 
+
+
 //description: đóng form
-//------------------------------------------------------
+//-----------------------
 //created by: ntkien 
 //created date: 24.08.2020
 export function closeForm(param){

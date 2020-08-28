@@ -1,7 +1,8 @@
 import React from 'react';
 import BaseList from '../../base/BaseList';
 import { connect } from 'react-redux';
-import { loadData,showFormInfo } from '../../../actions/customerAction';
+// import { loadData,showFormInfo } from '../../../actions/customerAction';
+import { doAction } from '../../../actions/action';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Space } from 'antd';
 import CustomerDetail from './CustomerDetail';
@@ -12,8 +13,7 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = dispatch => {
     return {
-        loadData: (param) => dispatch(loadData(param)),
-        showFormInfo: (param) => dispatch(showFormInfo(param)),
+        doAction: (type,param) => dispatch(doAction(type,param))
     }
 }
 class CustomerList extends BaseList {

@@ -23,10 +23,13 @@ class BaseList extends BaseComponent {
         var me = this;
         switch (commandName) {
             case Constant.commandName.add:
-                // me.showFormDetail(Constant.editMode.add, me.state.id);
-                me.props.showFormInfo({
-                    editMode:Constant.editMode.add
-                });
+                var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SHOW_FORM;
+                me.props.doAction(
+                    actionName,
+                    {
+                        editMode: Constant.editMode.add
+                    }
+                );
                 break;
             case Constant.commandName.dupplicate:
                 me.showFormDetail(Constant.editMode.dupplicate, me.state.id);
@@ -93,7 +96,8 @@ class BaseList extends BaseComponent {
         if (customparam) {
             param = customparam
         }
-        me.props.loadData(param);
+        var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.LOAD_DATA;
+        me.props.doAction(actionName, param);
     }
     refresh() {
         var me = this;
@@ -163,13 +167,13 @@ class BaseList extends BaseComponent {
             columns,
             isbusy: me.props.isbusy,
             data: me.props.data,
-            activeFirstRow:me.props.activeFirstRow
+            activeFirstRow: me.props.activeFirstRow
         }
 
-        
+
         var propsFormDetail = {
             showDetail: me.props.showDetail,
-            loadingDetail:me.props.loadingDetail
+            loadingDetail: me.props.loadingDetail
         }
         var detailForm = me.getFormDetail(propsFormDetail);
         return (
