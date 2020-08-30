@@ -3,5 +3,11 @@ import * as common from '../utility/common';
 
 export function paging(data) {
     var config = common.getDefaultHeader();
-    return axios.post("http://localhost:51602/base/customer/paging", data,config);
+    var url  = common.format("{0}/base/customer/paging",common.getAPIUrl())
+    return axios.post(url, data,config);
+}
+export function getById(id){
+    var config = common.getDefaultHeader();
+    var url = common.format("{0}/base/customer/{1}",common.getAPIUrl(),id);
+    return axios.get(url,config);  
 }

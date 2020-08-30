@@ -10,8 +10,11 @@ const initState = {
     },
     searchObject: null,
     entity: 'Customer',
+    primaryKey: 'CustomerId',
     activeFirstRow: false,
+    pageName: "Khách hàng",
 
+    id: '',
     loadingDetailForm: false,
     showDetail: false,
     masterData: null,
@@ -25,29 +28,35 @@ export function customers(state = initState, action) {
             result.isbusy = action.param.isbusy;
             break;
         case Constant.CustomerAction.LOAD_COMPLETE:
-            result.data = action.data.Data;
+            var datas = action.param.data.Data;
+            result.data = datas;
             result.isloading = false;
             result.isbusy = false;
-            result.pagination = action.pagination;
-            result.searchObject = action.searchObject;
+            result.pagination = action.param.pagination;
+            result.searchObject = action.param.searchObject;
+            result.id = (datas && datas.length > 0) ? datas[0][result.primaryKey]:'';
             result.activeFirstRow = true;
             break;
         case Constant.CustomerAction.SHOW_FORM:
             result.showDetail = true;
-            result.param = action.param;
+            result.editMode = action.param.editMode;
+            result.masterData=null;
+            result.id =action.param.id;
             result.activeFirstRow = false;
             break;
         case Constant.CustomerAction.CLOSE_FORM:
             result.showDetail = false;
-            result.param = action.param;
             result.activeFirstRow = false;
             break;
         case Constant.CustomerAction.LOAD_INFO:
             result.loadingDetailForm = true;
             result.activeFirstRow = false;
+            break;
         case Constant.CustomerAction.LOAD_INFO_COMPLETE:
             result.loadingDetailForm = false;
             result.activeFirstRow = false;
+            result.masterData = action.param;
+            break;
     }
     return result;
 }

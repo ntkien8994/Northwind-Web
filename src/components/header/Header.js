@@ -3,8 +3,8 @@ import { Button, Dropdown, Menu } from 'antd';
 // import { Icon } from '@ant-design/compatible';
 import GeneralForm from '../base/GeneralForm';
 import { LoginOutlined,LogoutOutlined,UserOutlined,DownOutlined } from '@ant-design/icons';
-
 import * as Constant from '../../utility/Constant';
+import * as common from '../../utility/common'; 
 var jwtDecode = require('jwt-decode');
 class Header extends GeneralForm {
     constructor(props) {
@@ -20,8 +20,8 @@ class Header extends GeneralForm {
 
     checkToken() {
         var me = this;
-        const refresh_token = me.getcookie(Constant.cookie.refresh_token);
-        const access_token = me.getcookie(Constant.cookie.access_token);
+        const refresh_token = common.getcookie(Constant.cookie.refresh_token);
+        const access_token = common.getcookie(Constant.cookie.access_token);
         if (!access_token || !refresh_token) {
             me.setState(
                 {
@@ -34,8 +34,8 @@ class Header extends GeneralForm {
             );
         }
         const requestBody = {
-            client_id: me.getcookie(Constant.cookie.client_id),
-            client_secret: me.getcookie(Constant.cookie.client_secret),
+            client_id: common.getcookie(Constant.cookie.client_id),
+            client_secret: common.getcookie(Constant.cookie.client_secret),
             refresh_token: refresh_token,
             grant_type: 'refresh_token'
         }
@@ -44,14 +44,14 @@ class Header extends GeneralForm {
                 'Content-Type': 'application/x-www-form-urlencoded',
             }
         }
-        var url = me.format(Constant.sso.accessTokenUri, me.getrealm());
-        me.apipost(url, me.stringify(requestBody), config)
+        var url = common.format(Constant.sso.accessTokenUri, common.getrealm());
+        me.apipost(url, common.stringify(requestBody), config)
             .then((result) => {
                 if (result.status == 200 && result.data) {
-                    me.setcookie(Constant.cookie.access_token, result.data.access_token, { path: '/' });
-                    me.setcookie(Constant.cookie.refresh_token, result.data.refresh_token, { path: '/' });
-                    me.setcookie(Constant.cookie.id_token, result.data.id_token, { path: '/' });
-                    me.setcookie(Constant.cookie.token_type, result.data.token_type, { path: '/' });
+                    common.setcookie(Constant.cookie.access_token, result.data.access_token, { path: '/' });
+                    common.setcookie(Constant.cookie.refresh_token, result.data.refresh_token, { path: '/' });
+                    common.setcookie(Constant.cookie.id_token, result.data.id_token, { path: '/' });
+                    common.setcookie(Constant.cookie.token_type, result.data.token_type, { path: '/' });
                     var objToken = jwtDecode(access_token);
                     if (objToken) {
                         me.setState(
@@ -110,16 +110,11 @@ class Header extends GeneralForm {
         me.setState({ isbusy: true });
         me.checkToken();
     }
-    componentWillReceiveProps(props) {
-        var me = this;
-        me.setState({ isbusy: true });
-        me.checkToken();
-    }
     render() {
         var me = this;
         var displaytext ='';
         if (me.state.firstname && me.state.lastname) {
-            displaytext = me.format("{0} {1}", me.state.firstname, me.state.lastname);
+            displaytext = common.format("{0} {1}", me.state.firstname, me.state.lastname);
         }
         else if (me.state.firstname) {
             displaytext = me.state.firstname;
@@ -137,7 +132,7 @@ class Header extends GeneralForm {
                 <div className='header-user-info'>
                     {
                         me.state.isbusy ? 
-                        me.getReactLoading({ type: 'spin', color: '#20a8d8', height: '30px', width: '30px' }) :
+                        common.getReactLoading({ type: 'spin', color: '#20a8d8', height: '30px', width: '30px' }) :
                         <>
                             {me.state.isAuthenticate ? 
                             <>                

@@ -149,7 +149,8 @@ class GridTable extends React.Component {
                     onRow={(record, rowIndex) => {
                         return {
                             onClick: event => {
-                                me.setSelectedRow(record[props.rkey])
+                                me.setSelectedRow(record[props.rkey]);
+                                me.props.onRowClick(record[props.rkey]);
                             }, // click row
                             onDoubleClick: event => {
                                 me.setSelectedRow(record[props.rkey])

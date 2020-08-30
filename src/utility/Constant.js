@@ -1,3 +1,6 @@
+export const ADD="Thêm"
+export const EDIT="Sửa"
+export const DELETE="Xóa"
 export const valueType = {
     string: "string",
     number: "number",

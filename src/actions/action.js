@@ -8,9 +8,3 @@ export function doAction(type,param){
         param
     }
 }
-export function doActionDetail(type,param){
-    return {
-        type:type,
-        param
-    }
-}

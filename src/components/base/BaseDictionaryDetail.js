@@ -7,10 +7,11 @@ class BaseDictionaryDetail extends BaseComponent {
     constructor(props) {
         super(props);
     }
+
     render() {
         var me = this;
         return (
-            <Modal title="Chi tiết khách hàng"
+            <Modal title={me.getTitle()}
                 visible={me.props.showDetail}
                 centered
                 footer={[
@@ -27,7 +28,7 @@ class BaseDictionaryDetail extends BaseComponent {
                     <Spin spinning={me.props.loadingDetailForm}>
                         <Form
                             id="myForm"
-                            initialValues={me.props.masterData}
+                            ref='form'
                             onFinish={me.onFinish}
                             name="basic"
                         >
@@ -51,6 +52,29 @@ class BaseDictionaryDetail extends BaseComponent {
         return null;
     }
 
+    //description: Tiêu đề form chi tiết
+    //----------------------------------
+    //created by: ntkien 
+    //created date: 30.08.2020
+    getTitle() {
+        var me = this;
+        if (!me.props.editMode) {
+            return me.props.pageName;
+        }
+        else if (me.props.editMode == Constant.editMode.add) {
+            return Constant.ADD + " " + me.props.pageName;
+        }
+        else if (me.props.editMode == Constant.editMode.edit) {
+            return Constant.EDIT + " " + me.props.pageName;
+        }
+        else {
+            return me.props.pageName;
+        }
+    }
+    //description: Submit form
+    //------------------------
+    //created by: ntkien 
+    //created date: 30.08.2020
     onFinish = (values) => {
 
     }
@@ -58,9 +82,11 @@ class BaseDictionaryDetail extends BaseComponent {
         var me = this;
         me.loadForm();
     }
-    componentDidUpdate() {
-        var me = this;
-        me.loadForm();
+    componentDidUpdate(){
+        var me=this;
+        if(!me.props.loadingDetailForm && me.props.masterData){
+            me.refs.form.setFieldsValue(me.props.masterData);
+        }
     }
     loadForm() {
         var me = this;
@@ -70,10 +96,13 @@ class BaseDictionaryDetail extends BaseComponent {
     }
     loadData() {
         var me = this;
-        var { param } = me.props;
         var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.LOAD_INFO;
         me.props.doAction(
-            actionName, param
+            actionName, 
+            {
+                editMode: me.props.editMode,
+                id: me.props.id
+            }
         );
     }
 

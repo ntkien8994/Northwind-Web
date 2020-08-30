@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseToolBar from './BaseToolBar';
-import BaseDetail from './BaseDetail';
 import * as Constant from '../../utility/Constant';
+import * as common from '../../utility/common';
 import { Pagination } from 'antd';
 import BaseComponent from './BaseComponent';
 import GridTable from '../controls/GridTable';
@@ -19,34 +19,63 @@ class BaseList extends BaseComponent {
         pagination.current = current;
         me.loadData(pagination, false, true, me.props.searchObject);
     };
+    showFormDetail(editMode, id) {
+        var me = this;
+        var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SHOW_FORM;
+        me.props.doAction(
+            actionName,
+            {
+                editMode,
+                id
+            }
+        );
+    }
+    gridCommand_Click = (commandName, id) => {
+        var me=this;
+        switch (commandName) {
+            case Constant.commandName.add:
+                me.showFormDetail(Constant.editMode.add);
+                break;
+            case Constant.commandName.dupplicate:
+                me.showFormDetail(Constant.editMode.dupplicate, id);
+                break;
+            case Constant.commandName.edit:
+                me.showFormDetail(Constant.editMode.edit, id);
+                break;
+            case Constant.commandName.delete:
+                me.state.contentConfirm = "Bạn có chắc chắn muốn xóa bản ghi này không?";
+                break;
+            case Constant.commandName.refresh:
+                me.refresh();
+                break;
+            case Constant.commandName.export:
+                break;
+            case Constant.commandName.help:
+                break;
+        }
+    }
     toolbar_Click = (commandName) => {
         var me = this;
         switch (commandName) {
             case Constant.commandName.add:
-                var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SHOW_FORM;
-                me.props.doAction(
-                    actionName,
-                    {
-                        editMode: Constant.editMode.add
-                    }
-                );
+                me.showFormDetail(Constant.editMode.add);
                 break;
             case Constant.commandName.dupplicate:
-                me.showFormDetail(Constant.editMode.dupplicate, me.state.id);
+                me.showFormDetail(Constant.editMode.dupplicate, me.props.id);
                 break;
             case Constant.commandName.edit:
-                if (!me.state.id) {
+                if (!me.props.id) {
                     alert("Bạn phải chọn ít nhất một bản ghi.");
                     return;
                 }
-                me.showFormDetail(Constant.editMode.edit, me.state.id);
+                me.showFormDetail(Constant.editMode.edit, me.props.id);
                 break;
             case Constant.commandName.delete:
-                if (!me.state.id) {
+                if (!me.props.id) {
                     alert("Bạn phải chọn ít nhất một bản ghi.");
                     return;
                 }
-                me.state.contentConfirm = "Bạn có chắc chắn muốn xóa bản ghi này không?";
+                me.props.contentConfirm = "Bạn có chắc chắn muốn xóa bản ghi này không?";
                 break;
             case Constant.commandName.refresh:
                 me.refresh();
@@ -143,6 +172,12 @@ class BaseList extends BaseComponent {
         }
         return scrollheight
     }
+
+    onRowClick = (id) => {
+        var me = this;
+
+    }
+
     render() {
         var me = this;
         window.addEventListener('resize', me.window_resize);
@@ -151,7 +186,7 @@ class BaseList extends BaseComponent {
             return (
                 <div className="center50 pdtop10">
                     {
-                        me.getReactLoading({ type: 'spin', color: '#20a8d8', height: '50px', width: '50px' })
+                        common.getReactLoading({ type: 'spin', color: '#20a8d8', height: '50px', width: '50px' })
                     }
                 </div>)
         }
@@ -159,7 +194,7 @@ class BaseList extends BaseComponent {
         var toobarConfig = me.getToolBarConfig();
         var scrollheight = me.getScrollHeight(toobarConfig ? 40 : 0);
         var columns = me.getColumns();
-        var key = me.props.key ? me.props.key : me.props.entity + "Id";
+        var key = me.props.primaryKey ? me.props.primaryKey : me.props.entity + "Id";
         var { current, pageSize, total } = me.props.pagination;
         var propsTable = {
             rkey: key,
@@ -172,8 +207,7 @@ class BaseList extends BaseComponent {
 
 
         var propsFormDetail = {
-            showDetail: me.props.showDetail,
-            loadingDetail: me.props.loadingDetail
+            showDetail: me.props.showDetail
         }
         var detailForm = me.getFormDetail(propsFormDetail);
         return (
@@ -184,6 +218,7 @@ class BaseList extends BaseComponent {
                 }
                 <div className='app-search-toolbar'>
                     <GridTable
+                        onRowClick={me.onRowClick}
                         {...propsTable} />
                 </div>
                 <div className='box-pagination'>
@@ -199,7 +234,7 @@ class BaseList extends BaseComponent {
                     />
                 </div>
                 {
-                    detailForm ? detailForm : null
+                    detailForm && me.props.showDetail ? detailForm : null
                 }
             </React.Fragment>
         );

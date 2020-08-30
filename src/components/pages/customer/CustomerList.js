@@ -6,6 +6,8 @@ import { doAction } from '../../../actions/action';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Space } from 'antd';
 import CustomerDetail from './CustomerDetail';
+import * as Constant from '../../../utility/Constant';
+
 const mapStateToProps = state => {
     return {
         ...state.customers
@@ -18,6 +20,7 @@ const mapDispatchToProps = dispatch => {
 }
 class CustomerList extends BaseList {
     getColumns() {
+        var me=this;
         return [
             {
                 title: 'Customer Code',
@@ -43,12 +46,15 @@ class CustomerList extends BaseList {
                 key: 'action',
                 width: 80,
                 align: 'center',
-                render: () => {
+                render: (text, record, index) => {
                     return (
                         <React.Fragment>
                             <Space size={20}>
-                                <a title='Sửa'><EditOutlined /></a>
-                                <a title='Xóa' style={{ color: 'red' }} ><DeleteOutlined /></a>
+                                <a title='Sửa' onClick={()=>{
+                                    debugger
+                                    me.gridCommand_Click(Constant.commandName.edit,record[me.props.primaryKey])
+                                    }}><EditOutlined /></a>
+                                <a title='Xóa' onClick={()=>me.gridCommand_Click(Constant.commandName.delete,record[me.props.primaryKey])} style={{ color: 'red' }} ><DeleteOutlined /></a>
                             </Space>
                         </React.Fragment>
                     )

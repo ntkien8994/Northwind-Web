@@ -47,7 +47,16 @@ export function loadInfo(param){
     }
 }
 
-
+// //description: load thông tin chi tiết của một đối tượng
+// //------------------------------------------------------
+// //created by: ntkien 
+// //created date: 24.08.2020
+// export function loadInfoComplete(param){
+//     return {
+//         type:Constant.CustomerAction.LOAD_INFO_COMPLETE,
+//         param
+//     }
+// }
 
 //description: đóng form
 //-----------------------
