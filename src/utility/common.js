@@ -16,7 +16,7 @@ export function getDefaultHeader() {
         }
     };
 }
-export function showToastMessage(message, type) {
+export function showToastMessage(message, type='success') {
     toast.configure({
         autoClose: 3000,
         position: toast.POSITION.TOP_RIGHT,

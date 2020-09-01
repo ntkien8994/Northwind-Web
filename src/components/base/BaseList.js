@@ -2,58 +2,65 @@ import React from 'react';
 import BaseToolBar from './BaseToolBar';
 import * as Constant from '../../utility/Constant';
 import * as common from '../../utility/common';
-import { Pagination } from 'antd';
+import { Pagination, Menu, message, Modal } from 'antd';
 import BaseComponent from './BaseComponent';
 import GridTable from '../controls/GridTable';
+import { PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircleFilled } from '@ant-design/icons';
+
 
 class BaseList extends BaseComponent {
-    //paging sau này để filter
+    //description: Handle filter,sortChange
+    //---------------------------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
     handleTableChange = (pagination, filters, sorter) => {
         var me = this;
-        me.loadData(pagination, false, true, me.props.searchObject);
+        var sort = null;
+        //nếu là sort
+        if (sorter.order) {
+            sort = [
+                {
+                    ColumnName: sorter.field,
+                    SortOperation: sorter.order == 'ascend' ? 'ASC' : 'DESC'
+                }
+            ]
+        }
+        me.loadData(me.props.pagination, false, true, me.props.searchObject,null,sort);
     };
-    //paging
+
+    //description: Paging change
+    //--------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
     onPaginationChange = (current, pageSize) => {
         var me = this;
         var pagination = { ...me.props.pagination };
         pagination.current = current;
         me.loadData(pagination, false, true, me.props.searchObject);
     };
-    showFormDetail(editMode, id) {
+
+    //description: show form chi tiết
+    //-------------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    showFormDetail(editMode, id, record) {
         var me = this;
         var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SHOW_FORM;
         me.props.doAction(
             actionName,
             {
                 editMode,
-                id
+                id,
+                record
             }
         );
     }
-    gridCommand_Click = (commandName, id) => {
-        var me=this;
-        switch (commandName) {
-            case Constant.commandName.add:
-                me.showFormDetail(Constant.editMode.add);
-                break;
-            case Constant.commandName.dupplicate:
-                me.showFormDetail(Constant.editMode.dupplicate, id);
-                break;
-            case Constant.commandName.edit:
-                me.showFormDetail(Constant.editMode.edit, id);
-                break;
-            case Constant.commandName.delete:
-                me.state.contentConfirm = "Bạn có chắc chắn muốn xóa bản ghi này không?";
-                break;
-            case Constant.commandName.refresh:
-                me.refresh();
-                break;
-            case Constant.commandName.export:
-                break;
-            case Constant.commandName.help:
-                break;
-        }
-    }
+
+
+    //description: toolbar_click
+    //--------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
     toolbar_Click = (commandName) => {
         var me = this;
         switch (commandName) {
@@ -64,18 +71,10 @@ class BaseList extends BaseComponent {
                 me.showFormDetail(Constant.editMode.dupplicate, me.props.id);
                 break;
             case Constant.commandName.edit:
-                if (!me.props.id) {
-                    alert("Bạn phải chọn ít nhất một bản ghi.");
-                    return;
-                }
-                me.showFormDetail(Constant.editMode.edit, me.props.id);
+                me.showFormDetail(Constant.editMode.edit, me.props.id, me.props.current);
                 break;
             case Constant.commandName.delete:
-                if (!me.props.id) {
-                    alert("Bạn phải chọn ít nhất một bản ghi.");
-                    return;
-                }
-                me.props.contentConfirm = "Bạn có chắc chắn muốn xóa bản ghi này không?";
+                me.doDelete();
                 break;
             case Constant.commandName.refresh:
                 me.refresh();
@@ -86,40 +85,102 @@ class BaseList extends BaseComponent {
                 break;
         }
     }
-    deleteItem(id) {
+
+    //description: Thực hiện hành động xóa
+    // vì control đang hiển thị nút Yes, No ngược nhau nên làm ngược lại
+    //------------------------------------------------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    doDelete() {
         var me = this;
-        var url = me.format(this.state.deleteUrl, id);
-        me.setState({ loading: true });
-        me.apidelete(url)
-            .then((result) => {
-                me.showToastMessage("Xóa bản ghi thành công!", "success");
-                var pagination = me.state.pagination;
-                pagination.current = 1;
-                me.state.pagination = pagination;
-                me.loadData();
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        Modal.confirm({
+            // title: Constant.FORM_TITLE,
+            icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />,
+            centered: true,
+            content: Constant.CONFIRM_DELETE,
+            okText: 'Không',
+            okButtonProps: {
+                type: 'primary',
+                danger: true
+            },
+            cancelText: 'Có',
+            cancelButtonProps: {
+                type: 'primary',
+            },
+            onCancel() {
+                me.ok()
+            },
+        });
     }
+    //description: Xóa 1 bản ghi
+    //--------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    deleteItem(currentItem) {
+        var me = this;
+        currentItem.EditMode = Constant.entityEditMode.delete;
+        var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SAVE_DATA;
+        me.props.doAction(actionName, {
+            masterData: currentItem
+        });
+    }
+
+    //description: Xác nhận xóa
+    //--------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
     ok = () => {
         var me = this;
-        me.apicall(() => me.deleteItem(me.state.id));
+        debugger
+        me.apicall(() => me.deleteItem(me.props.currentItem));
     }
+
+    //description: Danh sách các context menu
+    //---------------------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    getContextMenu() {
+        var me = this;
+        return (
+            <>
+                <Menu onClick={(evt) => me.toolbar_Click(evt.key)} style={{ width: 200 }} mode="vertical">
+                    <Menu.Item selectable={false} key="add" icon={<PlusCircleFilled style={{ color: '#52c41a' }} />} >Thêm mới</Menu.Item>
+                    <Menu.Item key="edit" icon={<EditFilled style={{ color: '#1890ff' }} />} >Sửa</Menu.Item>
+                    <Menu.Item key="delete" icon={<DeleteFilled style={{ color: 'red' }} />} >Xóa</Menu.Item>
+                    <Menu.Item key="refresh" className="seperator" icon={<SyncOutlined style={{ color: '#52c41a' }} />} >Làm mới</Menu.Item>
+                    <Menu.Item key="help" icon={<QuestionCircleFilled style={{ color: '#1890ff' }} />} >Trợ giúp</Menu.Item>
+                </Menu>
+            </>
+        )
+    }
+
+    //description: Danh sách chức năng toolbar
+    //---------------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     getToolBarConfig() {
         return ([
-            { commandName: Constant.commandName.add, value: "Thêm mới", icon: "plus-circle", color: "green", sortOrder: 0 },
-            { commandName: Constant.commandName.refresh, value: "Làm mới", icon: "sync", color: "green", sortOrder: 3 },
-            { commandName: Constant.commandName.help, value: "Trợ giúp", icon: "question-circle", sortOrder: 4 },
+            { commandName: Constant.commandName.add, value: "Thêm mới", icon: <PlusCircleFilled style={{ color: '#52c41a' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.edit, value: "Sửa", icon: <EditFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.delete, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.refresh, value: "Làm mới", icon: <SyncOutlined style={{ color: '#52c41a' }} />, seperator: true, sortOrder: 3 },
+            { commandName: Constant.commandName.help, value: "Trợ giúp", icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />, sortOrder: 4 },
         ]);
     }
-    loadData(pagination, isloading, isbusy, searchObject) {
+
+    //description: Load dữ liệu
+    //-------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
+    loadData(pagination, isloading, isbusy, searchObject, filters, sorters) {
         var me = this;
         var param = {
             isloading,
             isbusy,
             pagination,
-            searchObject
+            searchObject,
+            filters,
+            sorters
         }
         var customparam = me.getCustomParam(param);
         if (customparam) {
@@ -128,6 +189,11 @@ class BaseList extends BaseComponent {
         var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.LOAD_DATA;
         me.props.doAction(actionName, param);
     }
+
+    //description: Nạp lại dữ liệu
+    //----------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     refresh() {
         var me = this;
         var pagination = me.props.pagination,
@@ -136,31 +202,76 @@ class BaseList extends BaseComponent {
             searchObject = me.props.searchObject;
         me.apicall(() => me.loadData(pagination, isloading, isbusy, searchObject));
     }
+
+    //description: Custom lại data
+    //----------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     getCustomParam() {
         return null;
     }
+
+    //description: Form search dữ liệu
+    //--------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     getSearchPanel() {
         return null;
     }
+
+    //description: Form chi tiết
+    //--------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     getFormDetail(propsFormDetail) {
         return null;
     }
+
+    //description: Danh sách các cột hiển thị trên grid
+    //-------------------------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     getColumns() {
         return []
     }
-    componentDidMount() {
-        var me = this;
-        var pagination = me.props.pagination,
-            isloading = true,
-            isbusy = false,
-            searchObject = null;
 
-        me.apicall(() => me.loadData(pagination, isloading, isbusy, searchObject));
-    }
-    window_resize = () => {
+    //description: Show thông báo sau khi save dữ liệu
+    //-------------------------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
+    showNotifyAfterSave() {
         var me = this;
-        me.forceUpdate();
+        var { saveComplete, response } = me.props;
+        if (saveComplete) {
+            if (response && response.data == '1') {
+                message.success(Constant.SAVE_SUCCESS);
+            }
+            else {
+                message.error(Constant.SAVE_FAIL);
+            }
+            me.refresh();
+        }
     }
+
+    //description: Thực hiện thay đổi current item khi click vào từng row
+    //-------------------------------------------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
+    selectedChange(record) {
+        var me = this;
+        var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SELECTED_CHANGE;
+        me.props.doAction(
+            actionName,
+            {
+                record
+            }
+        )
+    }
+
+    //description: Lấy height của form
+    //---------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
     getScrollHeight(toolbarheight) {
         var elements = document.getElementsByClassName("app-body");
         var scrollheight = 500;
@@ -173,9 +284,32 @@ class BaseList extends BaseComponent {
         return scrollheight
     }
 
-    onRowClick = (id) => {
+    componentDidMount() {
         var me = this;
+        var pagination = me.props.pagination,
+            isloading = true,
+            isbusy = false,
+            searchObject = null;
 
+        me.apicall(() => me.loadData(pagination, isloading, isbusy, searchObject));
+    }
+    componentDidUpdate() {
+        var me = this;
+        me.showNotifyAfterSave();
+    }
+    window_resize = () => {
+        var me = this;
+        me.forceUpdate();
+    }
+
+    onRowClick = (record) => {
+        var me = this;
+        me.selectedChange(record);
+    }
+
+    onDbRowClick = (record) => {
+        var me = this;
+        me.showFormDetail(Constant.editMode.edit, record[me.props.primaryKey], record);
     }
 
     render() {
@@ -218,13 +352,15 @@ class BaseList extends BaseComponent {
                 }
                 <div className='app-search-toolbar'>
                     <GridTable
+                        onChange={me.handleTableChange}
                         onRowClick={me.onRowClick}
+                        onDbRowClick={me.onDbRowClick}
+                        menu={me.getContextMenu()}
                         {...propsTable} />
                 </div>
                 <div className='box-pagination'>
                     <Pagination
                         size="small"
-                        showSizeChanger={true}
                         current={current}
                         total={total}
                         pageSize={pageSize}

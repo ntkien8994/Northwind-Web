@@ -11,3 +11,8 @@ export function getById(id){
     var url = common.format("{0}/base/customer/{1}",common.getAPIUrl(),id);
     return axios.get(url,config);  
 }
+export function saveData(data){
+    var config = common.getDefaultHeader();
+    var url = common.format("{0}/base/customer",common.getAPIUrl());
+    return axios.post(url, data,config);
+}

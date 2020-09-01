@@ -81,7 +81,7 @@ class CustomerDetail extends BaseDictionaryDetail {
                     <Col span={6}>
                         <LabelForm >Điện thoại</LabelForm>
                     </Col>
-                    <Col span={8}>
+                    <Col span={18}>
                         <Form.Item
                             name="Phone"
                             rules={[

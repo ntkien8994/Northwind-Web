@@ -1,12 +1,21 @@
 export const ADD="Thêm"
 export const EDIT="Sửa"
 export const DELETE="Xóa"
+export const SAVE_SUCCESS="Thực hiện thành công."
+export const SAVE_FAIL="Thực hiện không thành công."
+export const CONFIRM_DELETE="Bạn có chắc chắn muốn xóa bản ghi này không?"
+export const FORM_TITLE="NorthWind"
+
+
+export const GUID_EMPTY="00000000-0000-0000-0000-000000000000";
+
 export const valueType = {
     string: "string",
     number: "number",
     date: "date",
     datetime: "datetime",
-    bool: "bool"
+    bool: "bool",
+    daterange:'daterange'
 }
 export const editMode = {
     add: "add",
@@ -15,6 +24,14 @@ export const editMode = {
     delete: "delete",
     none: "none"
 }
+
+export const entityEditMode = {
+    add: '1',
+    edit: '2',
+    delete: '3',
+    none: '0'
+}
+
 export const commandName = {
     add: "add",
     edit: "edit",
@@ -79,6 +96,9 @@ export const BaseAction={
     CLOSE_FORM:"_CLOSE_FORM",
     LOAD_INFO:"_LOAD_INFO",
     LOAD_INFO_COMPLETE:"_LOAD_INFO_COMPLETE",
+    SELECTED_CHANGE:'_SELECTED_CHANGE',
+    SAVE_DATA:'_SAVE_DATA',
+    SAVE_DATA_COMPLETE:'_SAVE_DATA_COMPLETE',
 }
 export const CustomerAction={
     LOAD_DATA:"CUSTOMER_LOAD_DATA",
@@ -89,4 +109,7 @@ export const CustomerAction={
     CLOSE_FORM:"CUSTOMER_CLOSE_FORM",
     LOAD_INFO:"CUSTOMER_LOAD_INFO",
     LOAD_INFO_COMPLETE:"CUSTOMER_LOAD_INFO_COMPLETE",
+    SELECTED_CHANGE: 'CUSTOMER_SELECTED_CHANGE',
+    SAVE_DATA:'CUSTOMER_SAVE_DATA',
+    SAVE_DATA_COMPLETE:'CUSTOMER_SAVE_DATA_COMPLETE'
 }
