@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button, Input, Space, DatePicker } from 'antd';
 import { Resizable } from 'react-resizable';
 import Popup from './Popup';
-import { SearchOutlined, CloseOutlined, CheckSquareOutlined, BorderOutlined } from '@ant-design/icons';
+import { SearchOutlined, CloseOutlined, CheckSquareOutlined, BorderOutlined,ReloadOutlined } from '@ant-design/icons';
 import * as Constant from '../../utility/Constant';
 import * as common from '../../utility/common';
 
@@ -129,11 +129,11 @@ class GridTable extends React.Component {
     getColumnSearchProps = col => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
             <div style={{ padding: 8 }}>
-                <Space size={0} >
+                <Space  >
                     {this.getDropdownControlFilter(col, setSelectedKeys, selectedKeys, confirm, clearFilters)}
-                    <Button type='primary' style={{ width: 45 }} icon={<SearchOutlined />} onClick={() => this.handleSearch(setSelectedKeys, selectedKeys, confirm, col.dataIndex)} >
+                    <Button title='Tìm kiếm' type='primary' style={{ width: 35 }} icon={<SearchOutlined />} onClick={() => this.handleSearch(setSelectedKeys, selectedKeys, confirm, col.dataIndex)} >
                     </Button>
-                    <Button type='primary' title='Xóa tìm kiếm' style={{ width: 45 }} danger={true} icon={<CloseOutlined />} onClick={() => this.handleReset(clearFilters)} >
+                    <Button  title='Xóa tìm kiếm' style={{ width: 35 }} danger={true} icon={<CloseOutlined />} onClick={() => this.handleReset(clearFilters)} >
                     </Button>
                 </Space>
             </div>

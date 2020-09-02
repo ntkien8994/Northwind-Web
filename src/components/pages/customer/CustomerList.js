@@ -28,7 +28,8 @@ class CustomerList extends BaseList {
                 key: 'CustomerCode',
                 width: 150,
                 ellipsis: true,
-                sorter: true
+                sorter: true,
+                fixed:'left'
             },
             {
                 title: 'Tên khách hàng',
@@ -36,7 +37,8 @@ class CustomerList extends BaseList {
                 key: 'CustomerName',
                 width: 250,
                 ellipsis: true,
-                sorter: true
+                sorter: true,
+                fixed:'left'
             },
             {
                 title: 'Số điện thoại',
@@ -78,6 +80,7 @@ class CustomerList extends BaseList {
                 width: 90,
                 dataType: Constant.valueType.bool,
                 ellipsis: true, 
+                
             },
           
         ]
