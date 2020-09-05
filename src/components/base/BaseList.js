@@ -25,9 +25,10 @@ class BaseList extends BaseComponent {
                 }
             ]
         }
-        me.loadData(me.props.pagination, false, true, me.props.searchObject,null,sort);
+        var filter = common.getFilter(filters,me.getColumns());
+        me.loadData(me.props.pagination, false, true, me.props.searchObject, filter, sort);
     };
-
+    
     //description: Paging change
     //--------------------------
     //created by: ntkien 
@@ -366,6 +367,7 @@ class BaseList extends BaseComponent {
                         pageSize={pageSize}
                         onChange={me.onPaginationChange}
                         showQuickJumper
+                        showSizeChanger={false}
                         showTotal={total => `Tổng số ${total} bản ghi`}
                     />
                 </div>

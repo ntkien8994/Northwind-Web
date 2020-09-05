@@ -8,14 +8,41 @@ export const FORM_TITLE="NorthWind"
 
 
 export const GUID_EMPTY="00000000-0000-0000-0000-000000000000";
+export const operationValues={
+    equals:'1',
+    contains:'2',
+    greateThan:'3',
+    greateThanEquals:'4',
+    lessThan:'5',
+    lessThanEquals:'6',
+    bettween: '7',
+    startsWith:'8',
+    endsWidth:'9'
+}
+export const operationFilter=[
+    {value:operationValues.equals,text:'=',title:'Bằng'},
+    {value:operationValues.contains,text:'<>',title:'Chứa'},
+    {value:operationValues.startsWith,text:"''%",title:'Bắt đầu bằng'},
+    {value:operationValues.endsWidth,text:"%''",title:'Kết thúc bằng'}
+]
+
+export const operationCompare=[
+    {value:operationValues.equals,text:"=",title:'Bằng'},
+    {value:operationValues.greateThan,text:">",title:'Lớn hơn'},
+    {value:operationValues.greateThanEquals,text:">=",title:'Lớn hơn hoặc bằng'},
+    {value:operationValues.lessThan,text:"<",title:'Nhỏ hơn'},
+    {value:operationValues.lessThanEquals,text:"=<",title:'Nhỏ hơn hoặc bằng'},
+]
 
 export const valueType = {
-    string: "string",
-    number: "number",
-    date: "date",
-    datetime: "datetime",
-    bool: "bool",
-    daterange:'daterange'
+    string: '0',
+    int:'1',
+    decimal:'2',
+    boolean: '3',
+    datetime: '4',
+    guid:'5',
+    number: "6",
+    daterange:'7',
 }
 export const editMode = {
     add: "add",

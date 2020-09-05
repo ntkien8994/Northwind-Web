@@ -110,3 +110,58 @@ export function getrealm() {
 export function getAPIUrl(){
     return "http://localhost:51602";
 }
+ //description: Hàm thực hiện build điều kiện lọc
+//----------------------------------------------
+//created by: ntkien 
+//created date: 03.09.2020
+export function getFilter(filters,cols) {
+    var me=this;
+    var results = [];
+    if (filters) {
+        if (cols && cols.length > 0) {
+            cols.map((item, index) => {
+                var vals = filters[item.dataIndex];
+                if (vals && vals.length > 0) {
+                    var obj = vals[0];
+                    var Operation = obj.operation;
+                    var ColumnType = obj.dataType;
+                    var ColumnName = item.dataIndex;
+                    var Value = obj.filterVal;
+                    var Value2 = null;
+                    if(obj.filterVal&&item.dataType ==Constant.valueType.datetime){
+                        var d = obj.filterVal.toDate();
+                        Value = format('{0}-{1}-{2} 00:00:00',d.getFullYear(), convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                        //nếu so sánh bằng
+                        if(Operation==Constant.operationValues.equals){
+                            Value2 = format('{0}-{1}-{2} 23:59:59',d.getFullYear(), convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                            Operation = Constant.operationValues.bettween; //toán tử bettwen
+                        }
+                        //nếu là nhỏ hơn bằng hoặc lớn hơn 
+                        else if(Operation==Constant.operationValues.lessThanEquals||Operation==Constant.operationValues.greateThan){
+                            Value = format('{0}-{1}-{2} 23:59:59',d.getFullYear(), convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                        }
+                    }
+                    else if(obj.filterVal&&item.dataType ==Constant.valueType.daterange){
+                        var d = obj.filterVal[0].toDate();
+                        var d2 = obj.filterVal[1].toDate();
+                        Value = format('{0}-{1}-{2} 00:00:00',d.getFullYear(),convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                        Value2 = format('{0}-{1}-{2} 23:59:59',d2.getFullYear(),convertMonthDate(d2.getMonth()+1) , convertMonthDate(d2.getDate()));
+                        ColumnType = Constant.valueType.datetime;
+                        Operation = Constant.operationValues.bettween; //toán tử bettwen
+                    }
+                    
+                    results.push(
+                        {
+                            ColumnName,
+                            Value,
+                            Value2,
+                            Operation:JSON.parse(Operation),
+                            ColumnType:JSON.parse(ColumnType)
+                        }
+                    );
+                }
+            });
+        }
+    }
+    return results;
+}

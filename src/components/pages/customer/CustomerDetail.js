@@ -1,6 +1,6 @@
 import React from 'react';
 import BaseDictionaryDetail from '../../base/BaseDictionaryDetail';
-import { Modal, Form, Checkbox, Button, Row, Col, Input } from 'antd';
+import { Modal, Form, Checkbox, Button, Row, Col, Input, InputNumber } from 'antd';
 import { connect } from 'react-redux';
 import { doAction } from '../../../actions/action';
 import * as Constant from '../../../utility/Constant';
@@ -73,6 +73,31 @@ class CustomerDetail extends BaseDictionaryDetail {
                             ]}
                         >
                             <Input />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
+                    <Col span={6}>
+                        <LabelForm  >Tuổi</LabelForm>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            name="Age"
+                        >
+                            <InputNumber style ={{width:'100%'}} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
+                    <Col span={6}>
+                        <LabelForm  >Doanh số</LabelForm>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            name="Revenue"
+                        >
+                            <InputNumber style ={{width:'100%'}} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={value => value.replace(/\$\s?|(,*)/g, '')} />
                         </Form.Item>
                     </Col>
                 </Row>

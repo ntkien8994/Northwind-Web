@@ -3,8 +3,6 @@ import BaseList from '../../base/BaseList';
 import { connect } from 'react-redux';
 // import { loadData,showFormInfo } from '../../../actions/customerAction';
 import { doAction } from '../../../actions/action';
-import { DeleteOutlined, EditOutlined,QuestionCircleOutlined } from '@ant-design/icons';
-import { Space,Popconfirm } from 'antd';
 import CustomerDetail from './CustomerDetail';
 import * as Constant from '../../../utility/Constant';
 
@@ -19,6 +17,7 @@ const mapDispatchToProps = dispatch => {
     }
 }
 class CustomerList extends BaseList {
+
     getColumns() {
         var me = this;
         return [
@@ -29,7 +28,8 @@ class CustomerList extends BaseList {
                 width: 150,
                 ellipsis: true,
                 sorter: true,
-                fixed:'left'
+                fixed:'left',
+                allowFilter:true
             },
             {
                 title: 'Tên khách hàng',
@@ -38,7 +38,30 @@ class CustomerList extends BaseList {
                 width: 250,
                 ellipsis: true,
                 sorter: true,
-                fixed:'left'
+                fixed:'left',
+                allowFilter:true
+            },
+            {
+                title: 'Tuổi',
+                dataIndex: 'Age',
+                key: 'Age',
+                width: 80,
+                ellipsis: true,
+                sorter: true,
+                align:'right',
+                dataType:Constant.valueType.int,
+                allowFilter:true
+            },
+            {
+                title: 'Doanh số',
+                dataIndex: 'Revenue',
+                key: 'Revenue',
+                width: 150,
+                ellipsis: true,
+                sorter: true,
+                align:'right',
+                dataType:Constant.valueType.decimal,
+                allowFilter:true
             },
             {
                 title: 'Số điện thoại',
@@ -51,7 +74,6 @@ class CustomerList extends BaseList {
                 title: 'Địa chỉ',
                 dataIndex: 'Address',
                 key: 'Address',
-                width:250,
                 ellipsis: true,
             },
             {
@@ -61,7 +83,8 @@ class CustomerList extends BaseList {
                 key: 'CreatedDate',
                 width: 110,
                 ellipsis: true,
-                dataType: Constant.valueType.datetime
+                dataType: Constant.valueType.datetime,
+                allowFilter:true
             },
             {
                 title: 'Ngày sửa',
@@ -70,7 +93,8 @@ class CustomerList extends BaseList {
                 key: 'ModifiedDate',
                 width: 110,
                 ellipsis: true,
-                dataType: Constant.valueType.daterange
+                dataType: Constant.valueType.daterange,
+                allowFilter:true
             },
             {
                 title: 'Ngừng theo dõi',
@@ -78,7 +102,7 @@ class CustomerList extends BaseList {
                 dataIndex: 'Inactive',
                 key: 'Inactive',
                 width: 90,
-                dataType: Constant.valueType.bool,
+                dataType: Constant.valueType.boolean,
                 ellipsis: true, 
                 
             },
