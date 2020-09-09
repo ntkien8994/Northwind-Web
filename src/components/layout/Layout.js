@@ -109,7 +109,7 @@ function ProLayout(props) {
             }
           </Menu>
         </Sider>
-        <Layout>
+        <Layout className='main-wrapper' >
           <Breadcrumb className='bg-white '>
             <Breadcrumb.Item href={breadcrumbRouters[0].path}>
               <Icon type="home" />

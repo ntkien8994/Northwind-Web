@@ -5,22 +5,18 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { ConfigProvider } from 'antd';
 import viVN from 'antd/es/locale/vi_VN';
-import { createStore,applyMiddleware,combineReducers } from 'redux';
+import { createStore,applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 //reducers
-import { layouts } from './reducers/layoutReducer';
-import {customers} from './reducers/customerReducer';
-//end reducers
-
+import reducers from '../src/reducers';
 //sagas
 import rootSaga from './sagas';
-//end sagas
 
 let sagaMiddleware = createSagaMiddleware();
-let reducers= combineReducers({layouts,customers});
 let store = createStore(reducers,applyMiddleware(sagaMiddleware));
 sagaMiddleware.run(rootSaga);
+
 ReactDOM.render(
   <React.StrictMode>
 

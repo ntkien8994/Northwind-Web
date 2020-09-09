@@ -3,10 +3,10 @@ import * as Constant from '../utility/Constant';
 import { doAction } from '../actions/action';
 import * as api from '../apis/apibase';
 
-function* customerSaga() {
-    yield takeEvery(Constant.CustomerAction.LOAD_DATA, loadData)
-    yield takeEvery(Constant.CustomerAction.LOAD_INFO, loadInfo)
-    yield takeEvery(Constant.CustomerAction.SAVE_DATA, saveData)
+function* productSaga() {
+    yield takeEvery(Constant.ProductAction.LOAD_DATA, loadData)
+    yield takeEvery(Constant.ProductAction.LOAD_INFO, loadInfo)
+    yield takeEvery(Constant.ProductAction.SAVE_DATA, saveData)
 }
 
 function* loadData(action) {
@@ -31,7 +31,7 @@ function* loadData(action) {
     var data = JSON.parse(result.data.data);
     pagination.total = data.TotalCount;
     yield put(doAction(
-        Constant.CustomerAction.LOAD_COMPLETE,
+        Constant.ProductAction.LOAD_COMPLETE,
         {
             data,
             pagination,
@@ -46,7 +46,7 @@ function* loadInfo(action) {
 
     var data = JSON.parse(result.data.data);
 
-    yield put(doAction(Constant.CustomerAction.LOAD_INFO_COMPLETE, data));
+    yield put(doAction(Constant.ProductAction.LOAD_INFO_COMPLETE, data));
 }
 
 function* saveData(action) {
@@ -55,12 +55,12 @@ function* saveData(action) {
         MasterData: JSON.stringify(masterData)
     }
     var result = yield call(() => api.saveData(data,entity));
-    yield put(doAction(Constant.CustomerAction.SAVE_DATA_COMPLETE,
+    yield put(doAction(Constant.ProductAction.SAVE_DATA_COMPLETE,
         {
             response:result.data
         }
     ));
 }
 
-export default customerSaga;
+export default productSaga;
 

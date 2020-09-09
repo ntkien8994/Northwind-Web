@@ -2,12 +2,13 @@ import React from 'react';
 import { Modal, Spin, Form, Button } from 'antd';
 import BaseComponent from './BaseComponent';
 import * as Constant from '../../utility/Constant';
+import moment from 'moment';
 
 class BaseDictionaryDetail extends BaseComponent {
     constructor(props) {
         super(props);
     }
-
+    
     //description: khi các form chi tiết kế thừa thì sẽ override lại để vẽ form
     //-------------------------------------------------------------------------
     //created by: ntkien 
@@ -61,7 +62,23 @@ class BaseDictionaryDetail extends BaseComponent {
             masterData.EditMode = Constant.entityEditMode.edit;
         }
     }
-    
+
+    //description: convert các giá trị kiểu DateTime sang moment
+    //----------------------------------------------------------
+    //created by: ntkien 
+    //created date: 08.09.2020
+    prepareDataShow(masterData) {
+        var me = this;
+        Object.keys(masterData).forEach((key) => {
+            if(key.endsWith('Date')){
+                if(masterData[key]){
+                    var d = moment(new Date(masterData[key]), Constant.FORMAT_DATETIME);
+                    masterData[key]=d;
+                }
+            }
+        })
+    }
+
     //description: Load form
     //------------------------
     //created by: ntkien 
@@ -84,7 +101,8 @@ class BaseDictionaryDetail extends BaseComponent {
             actionName,
             {
                 editMode: me.props.editMode,
-                id: me.props.id
+                id: me.props.id,
+                entity: me.props.entity
             }
         );
     }
@@ -134,7 +152,8 @@ class BaseDictionaryDetail extends BaseComponent {
         me.props.doAction(
             actionName,
             {
-                masterData
+                masterData,
+                entity: me.props.entity
             }
         )
     }
@@ -146,10 +165,11 @@ class BaseDictionaryDetail extends BaseComponent {
     componentDidUpdate() {
         var me = this;
         if (!me.props.loadingDetailForm && me.props.masterData) {
+            me.prepareDataShow(me.props.masterData);
             me.refs.form.setFieldsValue(me.props.masterData);
         }
     }
-    
+
     render() {
         var me = this;
         return (

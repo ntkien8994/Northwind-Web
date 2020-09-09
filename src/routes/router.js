@@ -5,6 +5,8 @@ import NoFound from '../components/pages/noFound/NoFound'
 import CallBack from '../components/authentication/CallBack';
 import Home from '../components/pages/home/Home';
 import CustomerList from '../components/pages/customer/CustomerList';
+import ProductList from '../components/pages/product/ProductList';
+import ContractList from '../components/pages/contract/ContractList';
 export const Router = () => (
 		<BrowserRouter>
 			<div>
@@ -35,6 +37,22 @@ export const routes = [
 		showmenu:true,
 		exact: true,
 		component: CustomerList,
+	},
+	{
+		path: '/products',
+		name: 'Sản phẩm',
+		icon: 'home',
+		showmenu:true,
+		exact: true,
+		component: ProductList,
+	},
+	{
+		path: '/contracts',
+		name: 'Hợp đồng',
+		icon: 'home',
+		showmenu:true,
+		exact: true,
+		component: ContractList,
 	}
 ]
 

@@ -124,8 +124,24 @@
   height: 40px;
   margin-left: 0px !important;
   margin-bottom: 0px !important;
-  padding-left: 10px;
+  padding-left: 4px;
 }
+.app-toobar-list .ant-space {
+  margin-top: 5px;
+}
+.app-toobar-list .ant-menu-horizontal{
+  line-height: 38px !important;
+}
+/* .app-toobar-list .ant-menu-horizontal > .ant-menu-submenu{
+  border-bottom: none !important;
+}*/
+.app-toobar-list .ant-menu-item{
+  padding: 0 15px !important;
+}
+.app-toobar-list .ant-menu-item:hover{
+  border-bottom-color: white !important;
+  cursor: pointer;
+} 
 .app-toobar-list li{
   display: inline;
   list-style: none;
@@ -493,4 +509,7 @@
 }
 .operation-filter .ant-select-selector{
   text-align:center;
+}
+.main-wrapper{
+  border-left: 5px solid #f0f2f5;
 }

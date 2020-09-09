@@ -412,7 +412,9 @@ class GridTable extends React.Component {
                                     document.addEventListener('click', function onClickOutside() {
                                         // me.setState({ popup: { showPopup: false } })
                                         showContextMenu = false;
-                                        popups[0].style.display = 'none';
+                                        if(popups[0]&&popups[0].style){
+                                            popups[0].style.display = 'none';
+                                        }
                                         document.removeEventListener('click', onClickOutside)
                                     })
                                 }

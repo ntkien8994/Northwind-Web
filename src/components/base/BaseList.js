@@ -122,7 +122,8 @@ class BaseList extends BaseComponent {
         currentItem.EditMode = Constant.entityEditMode.delete;
         var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SAVE_DATA;
         me.props.doAction(actionName, {
-            masterData: currentItem
+            masterData: currentItem,
+            entity: me.props.entity
         });
     }
 
@@ -132,7 +133,6 @@ class BaseList extends BaseComponent {
     //created date: 31.08.2020
     ok = () => {
         var me = this;
-        debugger
         me.apicall(() => me.deleteItem(me.props.currentItem));
     }
 
@@ -162,8 +162,8 @@ class BaseList extends BaseComponent {
     getToolBarConfig() {
         return ([
             { commandName: Constant.commandName.add, value: "Thêm mới", icon: <PlusCircleFilled style={{ color: '#52c41a' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.edit, value: "Sửa", icon: <EditFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.delete, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.edit,disableWhenZero:true, value: "Sửa", icon: <EditFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.delete,disableWhenZero:true, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
             { commandName: Constant.commandName.refresh, value: "Làm mới", icon: <SyncOutlined style={{ color: '#52c41a' }} />, seperator: true, sortOrder: 3 },
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />, sortOrder: 4 },
         ]);
@@ -181,7 +181,8 @@ class BaseList extends BaseComponent {
             pagination,
             searchObject,
             filters,
-            sorters
+            sorters,
+            entity: me.props.entity
         }
         var customparam = me.getCustomParam(param);
         if (customparam) {
@@ -228,6 +229,13 @@ class BaseList extends BaseComponent {
         return null;
     }
 
+    //description: Lấy panel chi tiết trong trường hợp có master/detail
+    //-----------------------------------------------------------------
+    //created by: ntkien 
+    //created date: 09.09.2020
+    getPanelDetail(){
+
+    }
     //description: Danh sách các cột hiển thị trên grid
     //-------------------------------------------------
     //created by: ntkien 
@@ -340,7 +348,6 @@ class BaseList extends BaseComponent {
             activeFirstRow: me.props.activeFirstRow
         }
 
-
         var propsFormDetail = {
             showDetail: me.props.showDetail
         }
@@ -349,7 +356,7 @@ class BaseList extends BaseComponent {
             <React.Fragment>
                 {me.getSearchPanel()}
                 {
-                    toobarConfig ? <BaseToolBar config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
+                    toobarConfig ? <BaseToolBar data={me.props.data} config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
                 }
                 <div className='app-search-toolbar'>
                     <GridTable
@@ -371,6 +378,9 @@ class BaseList extends BaseComponent {
                         showTotal={total => `Tổng số ${total} bản ghi`}
                     />
                 </div>
+                {
+                    me.props.isMasterDetail?this.getPanelDetail():null
+                }
                 {
                     detailForm && me.props.showDetail ? detailForm : null
                 }

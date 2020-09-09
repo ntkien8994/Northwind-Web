@@ -6,7 +6,7 @@ import ReactLoading from 'react-loading';
 import { v4 as uuidv4 } from 'uuid';
 import qs from 'querystring';
 import * as Constant from './Constant';
-import {helpers} from './Helpers';
+import { helpers } from './Helpers';
 var jwtDecode = require('jwt-decode');
 
 export function getDefaultHeader() {
@@ -16,7 +16,7 @@ export function getDefaultHeader() {
         }
     };
 }
-export function showToastMessage(message, type='success') {
+export function showToastMessage(message, type = 'success') {
     toast.configure({
         autoClose: 3000,
         position: toast.POSITION.TOP_RIGHT,
@@ -31,11 +31,11 @@ export function showToastMessage(message, type='success') {
             break;
     }
 }
-export function convertMonthDate(value){
-    if(!value || value.toString().length>1){
+export function convertMonthDate(value) {
+    if (!value || value.toString().length > 1) {
         return value;
     }
-    value ="0"+value;
+    value = "0" + value;
     return value;
 }
 export function getDateFromAspNetFormat(date) {
@@ -107,15 +107,15 @@ export function getrealm() {
     }
     return result;
 }
-export function getAPIUrl(){
+export function getAPIUrl() {
     return "http://localhost:51602";
 }
- //description: Hàm thực hiện build điều kiện lọc
+//description: Hàm thực hiện build điều kiện lọc
 //----------------------------------------------
 //created by: ntkien 
 //created date: 03.09.2020
-export function getFilter(filters,cols) {
-    var me=this;
+export function getFilter(filters, cols) {
+    var me = this;
     var results = [];
     if (filters) {
         if (cols && cols.length > 0) {
@@ -128,35 +128,35 @@ export function getFilter(filters,cols) {
                     var ColumnName = item.dataIndex;
                     var Value = obj.filterVal;
                     var Value2 = null;
-                    if(obj.filterVal&&item.dataType ==Constant.valueType.datetime){
+                    if (obj.filterVal && item.dataType == Constant.valueType.datetime) {
                         var d = obj.filterVal.toDate();
-                        Value = format('{0}-{1}-{2} 00:00:00',d.getFullYear(), convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                        Value = format('{0}-{1}-{2} 00:00:00', d.getFullYear(), convertMonthDate(d.getMonth() + 1), convertMonthDate(d.getDate()));
                         //nếu so sánh bằng
-                        if(Operation==Constant.operationValues.equals){
-                            Value2 = format('{0}-{1}-{2} 23:59:59',d.getFullYear(), convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                        if (Operation == Constant.operationValues.equals) {
+                            Value2 = format('{0}-{1}-{2} 23:59:59', d.getFullYear(), convertMonthDate(d.getMonth() + 1), convertMonthDate(d.getDate()));
                             Operation = Constant.operationValues.bettween; //toán tử bettwen
                         }
                         //nếu là nhỏ hơn bằng hoặc lớn hơn 
-                        else if(Operation==Constant.operationValues.lessThanEquals||Operation==Constant.operationValues.greateThan){
-                            Value = format('{0}-{1}-{2} 23:59:59',d.getFullYear(), convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
+                        else if (Operation == Constant.operationValues.lessThanEquals || Operation == Constant.operationValues.greateThan) {
+                            Value = format('{0}-{1}-{2} 23:59:59', d.getFullYear(), convertMonthDate(d.getMonth() + 1), convertMonthDate(d.getDate()));
                         }
                     }
-                    else if(obj.filterVal&&item.dataType ==Constant.valueType.daterange){
+                    else if (obj.filterVal && item.dataType == Constant.valueType.daterange) {
                         var d = obj.filterVal[0].toDate();
                         var d2 = obj.filterVal[1].toDate();
-                        Value = format('{0}-{1}-{2} 00:00:00',d.getFullYear(),convertMonthDate(d.getMonth()+1) , convertMonthDate(d.getDate()));
-                        Value2 = format('{0}-{1}-{2} 23:59:59',d2.getFullYear(),convertMonthDate(d2.getMonth()+1) , convertMonthDate(d2.getDate()));
+                        Value = format('{0}-{1}-{2} 00:00:00', d.getFullYear(), convertMonthDate(d.getMonth() + 1), convertMonthDate(d.getDate()));
+                        Value2 = format('{0}-{1}-{2} 23:59:59', d2.getFullYear(), convertMonthDate(d2.getMonth() + 1), convertMonthDate(d2.getDate()));
                         ColumnType = Constant.valueType.datetime;
                         Operation = Constant.operationValues.bettween; //toán tử bettwen
                     }
-                    
+
                     results.push(
                         {
                             ColumnName,
                             Value,
                             Value2,
-                            Operation:JSON.parse(Operation),
-                            ColumnType:JSON.parse(ColumnType)
+                            Operation: JSON.parse(Operation),
+                            ColumnType: JSON.parse(ColumnType)
                         }
                     );
                 }
@@ -165,3 +165,13 @@ export function getFilter(filters,cols) {
     }
     return results;
 }
+
+//description: Hàm convert kiểu datetime từ chuẩn iso 8601 sang dạng yyyy/MM/dd HH:mm:ss
+//-----------------------------------------------------------------------------
+//created by: ntkien 
+//created date: 08.09.2020
+// export function convertDateTime(value){
+//     var d = new Datetime(value);
+//     var result = format('yyyy/MM/dd HH:mm:ss',)
+//     return result;
+// }
