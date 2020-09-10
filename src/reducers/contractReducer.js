@@ -23,7 +23,8 @@ const initState = {
     masterData: null,
     editMode: Constant.editMode.none,
     saveComplete: false,
-    response:null
+    response:null,
+    isMasterDetail: true
 }
 export function contracts(state = initState, action) {
     var result = { ...state };

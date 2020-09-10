@@ -9,6 +9,7 @@ import * as Constant from './Constant';
 import { helpers } from './Helpers';
 var jwtDecode = require('jwt-decode');
 
+var numberFormat = Intl.NumberFormat('en-US');
 export function getDefaultHeader() {
     return {
         headers: {
@@ -166,12 +167,14 @@ export function getFilter(filters, cols) {
     return results;
 }
 
-//description: Hàm convert kiểu datetime từ chuẩn iso 8601 sang dạng yyyy/MM/dd HH:mm:ss
-//-----------------------------------------------------------------------------
+//description: Hàm convert kiểu số
+//--------------------------------
 //created by: ntkien 
-//created date: 08.09.2020
-// export function convertDateTime(value){
-//     var d = new Datetime(value);
-//     var result = format('yyyy/MM/dd HH:mm:ss',)
-//     return result;
-// }
+//created date: 10.09.2020
+export function formatNumber(value){
+    var result=null;
+    if(value){
+      result = numberFormat.format(value);
+    }
+    return result;
+}

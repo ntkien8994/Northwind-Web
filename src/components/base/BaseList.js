@@ -2,11 +2,11 @@ import React from 'react';
 import BaseToolBar from './BaseToolBar';
 import * as Constant from '../../utility/Constant';
 import * as common from '../../utility/common';
-import { Pagination, Menu, message, Modal } from 'antd';
+import { Pagination, Menu, message, Modal, Tabs } from 'antd';
 import BaseComponent from './BaseComponent';
 import GridTable from '../controls/GridTable';
 import { PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircleFilled } from '@ant-design/icons';
-
+const { TabPane } = Tabs;
 
 class BaseList extends BaseComponent {
     //description: Handle filter,sortChange
@@ -25,10 +25,10 @@ class BaseList extends BaseComponent {
                 }
             ]
         }
-        var filter = common.getFilter(filters,me.getColumns());
+        var filter = common.getFilter(filters, me.getColumns());
         me.loadData(me.props.pagination, false, true, me.props.searchObject, filter, sort);
     };
-    
+
     //description: Paging change
     //--------------------------
     //created by: ntkien 
@@ -162,8 +162,8 @@ class BaseList extends BaseComponent {
     getToolBarConfig() {
         return ([
             { commandName: Constant.commandName.add, value: "Thêm mới", icon: <PlusCircleFilled style={{ color: '#52c41a' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.edit,disableWhenZero:true, value: "Sửa", icon: <EditFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.delete,disableWhenZero:true, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.edit, disableWhenZero: true, value: "Sửa", icon: <EditFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.delete, disableWhenZero: true, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
             { commandName: Constant.commandName.refresh, value: "Làm mới", icon: <SyncOutlined style={{ color: '#52c41a' }} />, seperator: true, sortOrder: 3 },
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />, sortOrder: 4 },
         ]);
@@ -233,14 +233,31 @@ class BaseList extends BaseComponent {
     //-----------------------------------------------------------------
     //created by: ntkien 
     //created date: 09.09.2020
-    getPanelDetail(){
-
+    getPanelDetail() {
+        var me = this;
+        return (
+            <Tabs defaultActiveKey="1" type="card" size='small'>
+                <TabPane tab="Chi tiết" key="1">
+                    <GridTable
+                        columns={me.getColumnsDetail()}
+                    />
+                </TabPane>
+            </Tabs>
+        );
     }
     //description: Danh sách các cột hiển thị trên grid
     //-------------------------------------------------
     //created by: ntkien 
     //created date: 01.09.2020
     getColumns() {
+        return []
+    }
+
+    //description: Danh sách các cột hiển thị trên grid detail
+    //-------------------------------------------------
+    //created by: ntkien 
+    //created date: 01.09.2020
+    getColumnsDetail() {
         return []
     }
 
@@ -379,7 +396,7 @@ class BaseList extends BaseComponent {
                     />
                 </div>
                 {
-                    me.props.isMasterDetail?this.getPanelDetail():null
+                    me.props.isMasterDetail ? this.getPanelDetail() : null
                 }
                 {
                     detailForm && me.props.showDetail ? detailForm : null

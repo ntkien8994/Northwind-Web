@@ -7,7 +7,6 @@ class BaseToolBar extends React.Component {
     }
     render() {
         var me = this;
-        debugger
         return (
             <ul className="app-toobar-list">
                 <Menu onClick={(e)=>me.clickItem(e.key)} selectedKeys={[]} mode="horizontal">

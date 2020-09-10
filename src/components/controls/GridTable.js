@@ -78,7 +78,7 @@ class GridTable extends React.Component {
             case Constant.valueType.int:
             case Constant.valueType.decimal:
             case Constant.valueType.number:
-                return value;
+                return common.formatNumber(value);
                 break;
             default:
                 return value;

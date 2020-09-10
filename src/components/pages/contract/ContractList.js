@@ -16,6 +16,70 @@ const mapDispatchToProps = dispatch => {
     }
 }
 class ContractList extends BaseList {
+    getColumnsDetail() {
+        var me = this;
+        return [
+            {
+                title: 'Mã hàng hóa',
+                dataIndex: 'ProductCode',
+                key: 'ProductCode',
+                width: 120,
+                ellipsis: true,
+            },
+            {
+                title: 'Tên hàng hóa',
+                dataIndex: 'ProductName',
+                key: 'ProductName',
+                width: 200,
+                ellipsis: true,
+            },
+            {
+                title: 'Số lượng',
+                dataIndex: 'Quantity',
+                key: 'Quantity',
+                width: 80,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.int,
+            },
+            {
+                title: 'Đơn giá',
+                dataIndex: 'UnitPrice',
+                key: 'UnitPrice',
+                width: 150,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+            },
+            {
+                title: 'Thành tiền',
+                dataIndex: 'Amount',
+                key: 'Amount',
+                width: 150,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+            },
+            {
+                title: '% Khuyến mại',
+                dataIndex: 'PromotionRate',
+                key: 'PromotionRate',
+                width: 150,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+            },
+            {
+                title: 'Tổng tiền',
+                dataIndex: 'TotalAmount',
+                key: 'TotalAmount',
+                width: 150,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+            }
+        ]
+    }
     getColumns() {
         var me = this;
         return [
