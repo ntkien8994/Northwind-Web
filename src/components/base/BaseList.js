@@ -5,7 +5,7 @@ import * as common from '../../utility/common';
 import { Pagination, Menu, message, Modal, Tabs } from 'antd';
 import BaseComponent from './BaseComponent';
 import GridTable from '../controls/GridTable';
-import { PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircleFilled } from '@ant-design/icons';
+import {FileSearchOutlined , PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircleFilled,FileAddOutlined,FormOutlined } from '@ant-design/icons';
 const { TabPane } = Tabs;
 
 class BaseList extends BaseComponent {
@@ -145,11 +145,12 @@ class BaseList extends BaseComponent {
         return (
             <>
                 <Menu onClick={(evt) => me.toolbar_Click(evt.key)} style={{ width: 200 }} mode="vertical">
-                    <Menu.Item selectable={false} key="add" icon={<PlusCircleFilled style={{ color: '#52c41a' }} />} >Thêm mới</Menu.Item>
-                    <Menu.Item key="edit" icon={<EditFilled style={{ color: '#1890ff' }} />} >Sửa</Menu.Item>
-                    <Menu.Item key="delete" icon={<DeleteFilled style={{ color: 'red' }} />} >Xóa</Menu.Item>
-                    <Menu.Item key="refresh" className="seperator" icon={<SyncOutlined style={{ color: '#52c41a' }} />} >Làm mới</Menu.Item>
-                    <Menu.Item key="help" icon={<QuestionCircleFilled style={{ color: '#1890ff' }} />} >Trợ giúp</Menu.Item>
+                    <Menu.Item selectable={false} key={Constant.commandName.add} icon={<PlusCircleFilled style={{ color: '#52c41a' }} />} >Thêm mới</Menu.Item>
+                    <Menu.Item key={Constant.commandName.view} icon={<FileSearchOutlined style={{ color: '#1890ff' }} />} >Xem</Menu.Item>
+                    <Menu.Item key={Constant.commandName.edit} icon={<EditFilled style={{ color: '#1890ff' }} />} >Sửa</Menu.Item>
+                    <Menu.Item key={Constant.commandName.delete} icon={<DeleteFilled style={{ color: 'red' }} />} >Xóa</Menu.Item>
+                    <Menu.Item key={Constant.commandName.refresh} className="seperator" icon={<SyncOutlined style={{ color: '#52c41a' }} />} >Làm mới</Menu.Item>
+                    <Menu.Item key={Constant.commandName.help} icon={<QuestionCircleFilled style={{ color: '#1890ff' }} />} >Trợ giúp</Menu.Item>
                 </Menu>
             </>
         )
@@ -161,8 +162,9 @@ class BaseList extends BaseComponent {
     //created date: 01.09.2020
     getToolBarConfig() {
         return ([
-            { commandName: Constant.commandName.add, value: "Thêm mới", icon: <PlusCircleFilled style={{ color: '#52c41a' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.edit, disableWhenZero: true, value: "Sửa", icon: <EditFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.add, value: "Thêm mới", icon: <FileAddOutlined  style={{ color: '#52c41a' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.view,hideIfNotMaster:true, disableWhenZero: true, value: "Xem", icon: <FileSearchOutlined  style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.edit, disableWhenZero: true, value: "Sửa", icon: <FormOutlined  style={{ color: '#1890ff' }} />, sortOrder: 0 },
             { commandName: Constant.commandName.delete, disableWhenZero: true, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
             { commandName: Constant.commandName.refresh, value: "Làm mới", icon: <SyncOutlined style={{ color: '#52c41a' }} />, seperator: true, sortOrder: 3 },
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />, sortOrder: 4 },
@@ -235,12 +237,23 @@ class BaseList extends BaseComponent {
     //created date: 09.09.2020
     getPanelDetail() {
         var me = this;
+        // var propsTable = {
+        //     rkey: key,
+        //     scrollheight,
+        //     columns,
+        //     isbusy: me.props.isbusy,
+        //     data: me.props.data,
+        //     activeFirstRow: me.props.activeFirstRow
+        // }
         return (
-            <Tabs defaultActiveKey="1" type="card" size='small'>
+            <Tabs defaultActiveKey="1" style={{width:'100%',height:'230px'}} type="card" size='small'>
                 <TabPane tab="Chi tiết" key="1">
                     <GridTable
                         columns={me.getColumnsDetail()}
                     />
+                </TabPane>
+                <TabPane tab="Chi tiết 2" key="2">
+                    Chi tiết 2
                 </TabPane>
             </Tabs>
         );
@@ -368,21 +381,23 @@ class BaseList extends BaseComponent {
         var propsFormDetail = {
             showDetail: me.props.showDetail
         }
+        
         var detailForm = me.getFormDetail(propsFormDetail);
         return (
             <React.Fragment>
                 {me.getSearchPanel()}
                 {
-                    toobarConfig ? <BaseToolBar data={me.props.data} config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
+                    toobarConfig ? <BaseToolBar isMasterDetail={me.props.isMasterDetail} data={me.props.data} config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
                 }
-                <div className='app-search-toolbar'>
+                <div className={me.props.isMasterDetail?'master-table':'dictionary-table'}>
                     <GridTable
-                        onChange={me.handleTableChange}
-                        onRowClick={me.onRowClick}
-                        onDbRowClick={me.onDbRowClick}
-                        menu={me.getContextMenu()}
-                        {...propsTable} />
+                    onChange={me.handleTableChange}
+                    onRowClick={me.onRowClick}
+                    onDbRowClick={me.onDbRowClick}
+                    menu={me.getContextMenu()}
+                    {...propsTable} />
                 </div>
+                
                 <div className='box-pagination'>
                     <Pagination
                         size="small"

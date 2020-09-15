@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, Input, Space, DatePicker, Select,InputNumber } from 'antd';
+import { Table, Button, Input, Space, DatePicker, Select, InputNumber } from 'antd';
 import { Resizable } from 'react-resizable';
 import Popup from './Popup';
 import { SearchOutlined, CloseOutlined, CheckSquareOutlined, BorderOutlined, FilterFilled, InfoCircleFilled } from '@ant-design/icons';
@@ -241,7 +241,7 @@ class GridTable extends React.Component {
                     onPressEnter={value => {
                         this.handleSearch(setSelectedKeys, selectedKeys, confirm, col.dataIndex)
                     }}
-                    onChange={value => setSelectedKeys(me.buildSelectedValue(col, value?value.toString():''))}
+                    onChange={value => setSelectedKeys(me.buildSelectedValue(col, value ? value.toString() : ''))}
                 />
                 break;
             default:
@@ -385,9 +385,10 @@ class GridTable extends React.Component {
             menu: me.props.menu
         }
         return (
-            <div>
+            <>
                 <Table
                     size="small"
+                    emptyText='Không có dữ liệu'
                     onChange={me.props.onChange}
                     onRow={(record, rowIndex) => {
                         return {
@@ -412,7 +413,7 @@ class GridTable extends React.Component {
                                     document.addEventListener('click', function onClickOutside() {
                                         // me.setState({ popup: { showPopup: false } })
                                         showContextMenu = false;
-                                        if(popups[0]&&popups[0].style){
+                                        if (popups[0] && popups[0].style) {
                                             popups[0].style.display = 'none';
                                         }
                                         document.removeEventListener('click', onClickOutside)
@@ -463,7 +464,7 @@ class GridTable extends React.Component {
                     columns={columnsresize}
                     dataSource={props.data} />
                 <Popup {...menu} />
-            </div>
+            </>
         )
     }
 }

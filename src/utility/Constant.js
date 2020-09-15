@@ -63,12 +63,18 @@ export const entityEditMode = {
 export const commandName = {
     add: "add",
     edit: "edit",
+    saveAndNew: "saveAndNew",
+    saveAndClose: "saveAndClose",
     delete: "delete",
     dupplicate: "dupplicate",
     import:"import",
     export:"export",
     help:"help",
-    refresh:"refresh"
+    refresh:"refresh",
+    undo:'undo',
+    save: 'save',
+    close: 'close',
+    view:'view'
 }
 export const clients = {
     dashboard:"http://202.134.19.107:3000"
