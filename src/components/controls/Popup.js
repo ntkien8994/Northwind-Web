@@ -4,8 +4,9 @@ import { PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircl
 
 const Popup = (props) => {
     var menu = props.menu;
+    var id =props.tableId+'popup';
     return (
-        <div className="popup" style={{ visibility: 'hidden' }}>
+        <div className='popup' id={id} style={{ visibility: 'hidden' }}>
             {
                 menu
             }

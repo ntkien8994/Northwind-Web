@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Spin, Form, Space } from 'antd';
-import { UserOutlined,CloseCircleFilled,SaveOutlined,SaveFilled, DeleteFilled, UndoOutlined, QuestionCircleFilled,FileAddOutlined,FormOutlined } from '@ant-design/icons';
+import { UserOutlined, CloseCircleFilled, SaveFilled, DeleteFilled, UndoOutlined, QuestionCircleFilled, FileAddOutlined, FormOutlined } from '@ant-design/icons';
 import BaseComponent from './BaseComponent';
 import * as Constant from '../../utility/Constant';
 import moment from 'moment';
@@ -9,8 +9,8 @@ import BaseToolBar from '../base/BaseToolBar';
 class BaseMasterDetail extends BaseComponent {
     constructor(props) {
         super(props);
+        this.form = React.createRef();
     }
-
     //description: khi các form chi tiết kế thừa thì sẽ override lại để vẽ form
     //-------------------------------------------------------------------------
     //created by: ntkien 
@@ -33,6 +33,9 @@ class BaseMasterDetail extends BaseComponent {
         }
         else if (me.props.editMode == Constant.editMode.edit) {
             return Constant.EDIT + " " + me.props.pageName;
+        }
+        else if (me.props.editMode == Constant.editMode.none) {
+            return Constant.VIEW + " " + me.props.pageName;
         }
         else {
             return me.props.pageName;
@@ -63,6 +66,15 @@ class BaseMasterDetail extends BaseComponent {
         else if (me.props.editMode == Constant.editMode.edit) {
             masterData.EditMode = Constant.entityEditMode.edit;
         }
+    }
+
+    //description: hàm để khi cần thiết thì overide lại để set thêm giá trị
+    //---------------------------------------------------------------------
+    //created by: ntkien 
+    //created date: 30.08.2020
+    getDetailDataForSave() {
+        var me = this;
+        return [];
     }
 
     //description: convert các giá trị kiểu DateTime sang moment
@@ -116,15 +128,31 @@ class BaseMasterDetail extends BaseComponent {
     validate() {
         return true;
     }
-
     //description: Thực hiện save data
     //---------------------------------
     //created by: ntkien 
     //created date: 30.08.2020
-    saveData = (masterData) => {
+    doSaveData = async (saveMode) => {
+        var me = this;
+        const values = await me.form.current.validateFields();
+        if (values) {
+            var masterData = { ...me.props.masterData };
+            Object.keys(values).forEach((key) => {
+                masterData[key] = values[key];
+            })
+            var details = me.getDetailDataForSave();
+            me.prepareDataBeforeSave(masterData);
+            me.saveData(masterData,details,saveMode);
+        }
+    }
+    //description: Thực hiện save data
+    //---------------------------------
+    //created by: ntkien 
+    //created date: 30.08.2020
+    saveData = (masterData,details,saveMode) => {
         var me = this;
         if (me.validate()) {
-            me.apicall(() => me.submitData(masterData));
+            me.apicall(() => me.submitData(masterData,details,saveMode));
         }
     }
 
@@ -135,7 +163,7 @@ class BaseMasterDetail extends BaseComponent {
     closeForm = (sender) => {
         var me = this;
         //nếu click ra ngoài thì ko thực hiện đóng form
-        if (sender.currentTarget.nodeName == 'DIV') {
+        if (sender && sender.currentTarget.nodeName == 'DIV') {
             return
         }
         var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.CLOSE_FORM;
@@ -148,44 +176,66 @@ class BaseMasterDetail extends BaseComponent {
     //-------------------------------------
     //created by: ntkien 
     //created date: 30.08.2020
-    submitData(masterData) {
+    submitData(masterData, details, saveMode) {
         var me = this;
         var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SAVE_DATA;
         me.props.doAction(
             actionName,
             {
                 masterData,
-                entity: me.props.entity
+                entity: me.props.entity,
+                saveMode,
+                details
             }
         )
     }
-
+    //description: Thực hiện thay đổi editmode của form
+    //-------------------------------------------------
+    //created by: ntkien 
+    //created date: 30.08.2020
+    changeEditMode(editMode) {
+        var me = this;
+        var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.CHANGE_EDITMODE;
+        me.props.doAction(
+            actionName,
+            {
+                editMode
+            }
+        );
+        setTimeout(() => { me.loadData() }, 50)
+    }
     componentDidMount() {
         var me = this;
         me.loadForm();
     }
     componentDidUpdate() {
         var me = this;
-        if (!me.props.loadingDetailForm && me.props.masterData) {
+        if (!me.props.loadingDetailForm && me.props.masterData && !me.props.formShown) {
             me.prepareDataShow(me.props.masterData);
-            me.refs.form.setFieldsValue(me.props.masterData);
+            me.form.current.setFieldsValue(me.props.masterData);
+        }
+        //nếu là lưu và thêm mới thì load lại data
+        if(me.props.saveComplete && me.props.editMode==Constant.editMode.add){
+            me.loadData();
         }
     }
-    getToolbars=()=>{
+    getToolbars = () => {
+        var me = this;
+        var isViewMode = (me.props.editMode === Constant.editMode.none);
         return ([
-            { commandName: Constant.commandName.add, value: "Thêm mới", icon: <FileAddOutlined  style={{ color: '#52c41a' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.edit, disableWhenZero: true, value: "Sửa", icon: <FormOutlined  style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.save, value: "Lưu", icon: <SaveFilled  style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.saveAndNew,parentCode:Constant.commandName.save, value: "Lưu & Thêm mới", icon: <SaveFilled  style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.saveAndClose,parentCode:Constant.commandName.save, value: "Lưu & Đóng", icon: <SaveFilled  style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.add, disabled: !isViewMode, value: "Thêm mới", icon: <FileAddOutlined style={{ color: '#52c41a' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.edit, disabled: !isViewMode, value: "Sửa", icon: <FormOutlined style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.save, disabled: isViewMode, value: "Lưu", icon: <SaveFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.saveAndNew, parentCode: Constant.commandName.save, value: "Lưu & Thêm mới", icon: <SaveFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.saveAndClose, parentCode: Constant.commandName.save, value: "Lưu & Đóng", icon: <SaveFilled style={{ color: '#1890ff' }} />, sortOrder: 0 },
 
-            { commandName: Constant.commandName.delete, disableWhenZero: true, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.undo, value: "Hoãn", icon:<UndoOutlined style={{ color: '#1890ff' }} />, seperator: true, sortOrder: 3 },
+            { commandName: Constant.commandName.delete, disabled: !isViewMode, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.undo, disabled: isViewMode, value: "Hoãn", icon: <UndoOutlined style={{ color: '#1890ff' }} />, seperator: true, sortOrder: 3 },
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />, sortOrder: 4 },
             { commandName: Constant.commandName.close, value: "Đóng", icon: <CloseCircleFilled style={{ color: 'red' }} />, sortOrder: 4 },
         ]);
     }
-//description: toolbar_click
+    //description: toolbar_click
     //--------------------------
     //created by: ntkien 
     //created date: 31.08.2020
@@ -193,49 +243,103 @@ class BaseMasterDetail extends BaseComponent {
         var me = this;
         switch (commandName) {
             case Constant.commandName.add:
-                me.showFormDetail(Constant.editMode.add);
+                me.changeEditMode(Constant.editMode.add);
+                // me.showFormDetail(Constant.editMode.add);
                 break;
             case Constant.commandName.dupplicate:
-                me.showFormDetail(Constant.editMode.dupplicate, me.props.id);
+                // me.showFormDetail(Constant.editMode.dupplicate, me.props.id);
                 break;
             case Constant.commandName.edit:
-                me.showFormDetail(Constant.editMode.edit, me.props.id, me.props.current);
+                me.changeEditMode(Constant.editMode.edit);
+                // me.showFormDetail(Constant.editMode.edit, me.props.id, me.props.current);
                 break;
             case Constant.commandName.delete:
                 me.doDelete();
                 break;
-            case Constant.commandName.refresh:
-                me.refresh();
+            case Constant.commandName.undo:
+                if (me.props.editMode == Constant.editMode.add) {
+                    me.closeForm();
+                }
+                else {
+                    me.changeEditMode(Constant.editMode.none);
+                    me.disableControl();
+                }
                 break;
-            case Constant.commandName.export:
+            case Constant.commandName.save:
+            case Constant.commandName.saveAndClose:
+            case Constant.commandName.saveAndNew:
+                me.doSaveData(commandName);
+                break;
+            case Constant.commandName.close:
+                me.closeForm();
                 break;
             case Constant.commandName.help:
                 break;
         }
     }
+    //description: Thực hiện hành động xóa
+    // vì control đang hiển thị nút Yes, No ngược nhau nên làm ngược lại
+    //------------------------------------------------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    doDelete() {
+        var me = this;
+        Modal.confirm({
+            // title: Constant.FORM_TITLE,
+            icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />,
+            centered: true,
+            content: Constant.CONFIRM_DELETE,
+            okText: 'Không',
+            okButtonProps: {
+                type: 'primary',
+                danger: true
+            },
+            cancelText: 'Có',
+            cancelButtonProps: {
+                type: 'primary',
+            },
+            onCancel() {
+                me.ok()
+            },
+        });
+    }
+    //description: Xóa 1 bản ghi
+    //--------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    deleteItem(currentItem) {
+        var me = this;
+        currentItem.EditMode = Constant.entityEditMode.delete;
+        var actionName = me.props.entity.toUpperCase() + Constant.BaseAction.SAVE_DATA;
+        me.props.doAction(actionName, {
+            masterData: currentItem,
+            entity: me.props.entity
+        });
+    }
+
+    //description: Xác nhận xóa
+    //--------------------------
+    //created by: ntkien 
+    //created date: 31.08.2020
+    ok = () => {
+        var me = this;
+        me.apicall(() => me.deleteItem(me.props.masterData));
+    }
     render() {
         var me = this;
+        var formWidth = me.props.formDetailWidth ? me.props.formDetailWidth : 800;
         return (
             <Modal className='voucher-form' title={me.getTitle()}
                 visible={me.props.showDetail}
                 centered
-                // footer={[
-                //     <Button form="myForm" key="submit" htmlType="submit" type="primary" >
-                //         Cập nhật
-                // </Button>,
-                //     <Button key="back" type="primary" danger onClick={me.closeForm}>
-                //         Hủy bỏ
-                // </Button>,
-                // ]}
                 footer={false}
                 onCancel={me.closeForm}
-                width={800}>
+                width={formWidth}>
                 <React.Fragment>
                     <Spin spinning={me.props.loadingDetailForm}>
                         <Form
                             id="myForm"
-                            ref='form'
-                            onFinish={me.onFinish}
+                            ref={me.form}
                             name="basic"
                         >
                             <div className='toolbar-form'>

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Table, Button, Input, Space, DatePicker, Select, InputNumber } from 'antd';
+import { Tooltip, Table, Button, Input, Space, DatePicker, Select, InputNumber, Form } from 'antd';
 import { Resizable } from 'react-resizable';
 import Popup from './Popup';
-import { SearchOutlined, CloseOutlined, CheckSquareOutlined, BorderOutlined, FilterFilled, InfoCircleFilled } from '@ant-design/icons';
+import { SearchOutlined, CloseOutlined, CheckSquareOutlined, BorderOutlined, FilterFilled, FileDoneOutlined, FileExcelOutlined } from '@ant-design/icons';
 import * as Constant from '../../utility/Constant';
 import * as common from '../../utility/common';
 
@@ -12,9 +12,116 @@ const { Option } = Select;
 var showContextMenu = false;
 var popupWidth = 0;
 var popupHeight = 0;
+const EditableCell = ({
+    editing,
+    dataIndex,
+    title,
+    datatype,
+    record,
+    index,
+    children,
+    cellValueChange,
+    required,
+    memberkey,
+    valuekey,
+    datasource,
+    ...restProps
+}) => {
+    const inputNode = getInputType(dataIndex, datatype, datasource, valuekey, memberkey, cellValueChange, record);
+    return (
+        <td {...restProps}>
+            {editing ? (
+                <Form.Item
+                    name={dataIndex}
+                    style={{
+                        margin: 0,
+                    }}
+                    rules={[
+                        {
+                            required: required,
+                            message: `${title} không được để trống!`,
+                        },
+                    ]}
+                >
+                    {inputNode}
+                </Form.Item>
+            ) : (
+                    children
+                )}
+        </td>
+    );
+};
 
-
-
+//description: lấy input theo value type
+//--------------------------------------
+//created by: ntkien 
+//created date: 17.09.2020
+function getInputType(dataIndex, valueType, data, valuekey, memberkey, cellValueChange, record) {
+    if (data) {
+        return <Select onChange={(value) => {
+            if (cellValueChange) {
+                // updateValue(record, dataIndex, valueType, value);
+                cellValueChange(record, dataIndex, value, valueType);
+            }
+        }}  >
+            {data.map((item, index) => <Option value={item[valuekey]}>{item[memberkey]}</Option>)}
+        </Select>
+    }
+    else {
+        switch (valueType) {
+            case Constant.valueType.int:
+            case Constant.valueType.number:
+                return <InputNumber onChange={(value) => {
+                    // updateValue(record,dataIndex,valueType,value);
+                    if (cellValueChange) {
+                        cellValueChange(record, dataIndex, value, valueType)
+                    }
+                }} style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={value => value.replace(/\$\s?|(,*)/g, '')} />
+            case Constant.valueType.decimal:
+                return <InputNumber onChange={(value) => {
+                    // updateValue(record, dataIndex, valueType, value);
+                    if (cellValueChange) {
+                        cellValueChange(record, dataIndex, value, valueType)
+                    }
+                }} style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={value => value.replace(/\$\s?|(,*)/g, '')} />
+                break;
+            case Constant.valueType.percent:
+                return <InputNumber onChange={(value) => {
+                    // updateValue(record, dataIndex, valueType, value);
+                    if (cellValueChange) {
+                        cellValueChange(record, dataIndex, value, valueType)
+                    }
+                }} min={0} max={100} style={{ width: '100%' }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={value => value.replace(/\$\s?|(,*)/g, '')} />
+                break;
+            case Constant.valueType.datetime:
+                return <DatePicker onChange={(e) => {
+                    // updateValue(record, dataIndex, valueType, e);
+                    if (cellValueChange) {
+                        cellValueChange(record, dataIndex, e, valueType)
+                    }
+                }} style={{ width: '100%' }} format={Constant.FORMAT_DATE} />
+                break;
+            default:
+                return <Input onBlur={(e) => {
+                    // updateValue(record, dataIndex, valueType, e.currentTarget.defaultValue);
+                    if (cellValueChange) {
+                        cellValueChange(record, dataIndex, e.currentTarget.defaultValue, valueType)
+                    }
+                }} />
+                break;
+        }
+    }
+}
+//description: Cập nhật giá trị cho cell
+//--------------------------------------
+//created by: ntkien 
+//created date: 19.09.2020
+function updateValue(record, dataIndex, valueType, value) {
+    record[dataIndex] = value;
+}
 const ResizableTitle = props => {
     const { onResize, width, ...restProps } = props;
 
@@ -45,14 +152,22 @@ var components = {
     header: {
         cell: ResizableTitle,
     },
+    body: {
+        cell: EditableCell
+    }
 };
 class GridTable extends React.Component {
     constructor(props) {
-        super(props);
+        super();
         this.state = {
             columns: props.columns,
-            operations: []
+            operations: [],
+            editingKey: '',
+            tableId: common.getnewid(),
+            current: null,
+            originalItem: null
         }
+        this.myform = React.createRef();
     }
     handleSearch = (setSelectedKeys, selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -60,29 +175,40 @@ class GridTable extends React.Component {
     handleReset = clearFilters => {
         clearFilters();
     };
-    convertColumnValue = (value, dataType) => {
-        switch (dataType) {
-            case Constant.valueType.boolean:
-                return value ? <CheckSquareOutlined style={{ color: '#0095ff' }} /> : <BorderOutlined style={{ color: '#0095ff' }} />;
-                break;
-            case Constant.valueType.datetime:
-            case Constant.valueType.daterange:
-                if (value) {
-                    var date = new Date(value);
-                    return common.format("{0}/{1}/{2}", common.convertMonthDate(date.getDate()), common.convertMonthDate(date.getMonth() + 1), date.getFullYear());
-                }
-                else {
-                    return "";
-                }
-                break;
-            case Constant.valueType.int:
-            case Constant.valueType.decimal:
-            case Constant.valueType.number:
-                return common.formatNumber(value);
-                break;
-            default:
-                return value;
-                break;
+    convertColumnValue = (value, dataType, datasource, memberkey, dataIndex) => {
+        if (datasource && datasource.length > 0) {
+            var arr = datasource.filter(x => x[dataIndex] == value);
+            if (arr && arr.length > 0) {
+                return arr[0][memberkey];
+            }
+        }
+        else {
+            switch (dataType) {
+                case Constant.valueType.boolean:
+                    return value ? <CheckSquareOutlined style={{ color: '#0095ff' }} /> : <BorderOutlined style={{ color: '#0095ff' }} />;
+                    break;
+                case Constant.valueType.datetime:
+                case Constant.valueType.daterange:
+                    if (value) {
+                        var date = new Date(value);
+                        return common.format("{0}/{1}/{2}", common.convertMonthDate(date.getDate()), common.convertMonthDate(date.getMonth() + 1), date.getFullYear());
+                    }
+                    else {
+                        return "";
+                    }
+                    break;
+                case Constant.valueType.int:
+                case Constant.valueType.decimal:
+                case Constant.valueType.number:
+                    return common.formatNumber(value);
+                    break;
+                case Constant.valueType.percent:
+                    return common.formatPercent(value);
+                    break;
+                default:
+                    return value;
+                    break;
+            }
         }
     }
     getOperationCombo(col, setSelectedKeys, selectedKeys, confirm, clearFilters) {
@@ -281,42 +407,6 @@ class GridTable extends React.Component {
         }
     } : null);
 
-
-    //resize column
-    components = () => {
-        var me = this;
-        return {
-            header: {
-                cell: me.ResizeableTitle,
-            }
-        }
-    };
-    ResizeableTitle = props => {
-        const { onResize, width, ...restProps } = props;
-
-        if (!width) {
-            return <th {...restProps} />;
-        }
-
-        return (
-            <Resizable
-                width={width}
-                height={0}
-                handle={
-                    <span
-                        className="react-resizable-handle"
-                        onClick={e => {
-                            e.stopPropagation();
-                        }}
-                    />
-                }
-                onResize={onResize}
-                draggableOpts={{ enableUserSelectHack: false }}
-            >
-                <th {...restProps} />
-            </Resizable>
-        );
-    };
     handleResize = index => (e, { size }) => {
         var me = this;
         me.setState(({ columns }) => {
@@ -328,15 +418,25 @@ class GridTable extends React.Component {
             return { columns: nextColumns };
         });
     };
+
+    //description: Đánh dấu selected item 
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
     setSelectedRow(rowId) {
+        var me = this;
         const selectedClass = 'grid-table-selected-row';
-        var rows = document.querySelectorAll('.ant-table-row');
+        var element = document.getElementById(me.state.tableId);
+        if (!element) {
+            return;
+        }
+        var rows = element.querySelectorAll('.ant-table-row');
         if (rows && rows.length > 0) {
             rows.forEach(element => {
                 element.classList.remove(selectedClass);
             });
         }
-        var element = document.querySelector("[data-row-key='" + rowId + "']");
+        var element = element.querySelector("[data-row-key='" + rowId + "']");
         if (element) {
             element.classList.add(selectedClass);
         }
@@ -346,6 +446,7 @@ class GridTable extends React.Component {
         if (me.props.data && me.props.data.length > 0) {
             var selectedId = me.props.data[0][me.props.rkey];
             me.setSelectedRow(selectedId);
+            me.state.current = me.props.data[0]
         }
     }
     componentDidUpdate() {
@@ -354,13 +455,144 @@ class GridTable extends React.Component {
             var selectedId = me.props.data[0][me.props.rkey];
             me.scrollToTop();
             me.setSelectedRow(selectedId);
+            me.state.current = me.props.data[0]
         }
     }
     scrollToTop() {
-        var tableBody = document.querySelector('.ant-table-body');
+        var me = this;
+        var element = document.getElementById(me.state.tableId);
+        var tableBody = element.querySelector('.ant-table-body');
         if (tableBody) {
             tableBody.scrollTop = 0;
         }
+    }
+
+    //description: lấy bản ghi hiện tại đang select
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    getCurrent() {
+        var me = this;
+        return me.state.current;
+    }
+    //description: set select cho một bản ghi
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    setCurrent(record) {
+        var me = this;
+        setTimeout(() => {
+            me.state.current = record;
+            me.setSelectedRow(record[me.props.rkey]);
+        }, 50)
+    }
+    //description: focus vào một row
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    focusRow(record) {
+        var me = this;
+        setTimeout(() => {
+            me.state.current = record;
+            me.state.originalItem = { ...record };
+            me.edit(record);
+            me.setSelectedRow(record[me.props.rkey])
+        }, 50);
+    }
+
+    //description: binding lại giá trị đang sửa
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    reBindingForm(record) {
+        var me = this;
+        me.myform.current.setFieldsValue({
+            ...record,
+        });
+        me.forceUpdate();
+    }
+    //description: update lại grid
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    updateGrid() {
+        var me = this;
+        me.forceUpdate();
+    }
+    //description: update lại grid về mode view
+    //----------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    updateGridToView() {
+        var me = this;
+        me.setState(
+            {
+                editingKey: ''
+            }
+        );
+    }
+    //description: Sửa row
+    //---------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    edit = (record) => {
+        var me = this;
+        me.myform.current.setFieldsValue({
+            ...record,
+        });
+        me.setState(
+            {
+                editingKey: record.RowId
+            }
+        );
+    };
+    //description: kiểm tra có phải là đang sửa đối tượng ko
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    isEditing = (record) => record.RowId === this.state.editingKey;
+
+    //description: Cập nhật thay đổi trên row
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    save = async (record) => {
+        var me = this;
+        const row = await me.myform.current.validateFields();
+        if (row) {
+            Object.keys(row).forEach((key) => {
+                record[key] = row[key];
+            })
+            if (!record.EditMode || record.EditMode == Constant.editMode.none) {
+                record.EditMode = Constant.editMode.edit;
+            }
+            me.setState(
+                {
+                    editingKey: ''
+                }
+            );
+            if (me.props.acceptChange) {
+                me.props.acceptChange(record);
+            }
+        }
+    }
+
+    //description: hủy việc sửa trên row
+    //------------------------------------------
+    //created by: ntkien 
+    //created date: 17.09.2020
+    cancel = (record) => {
+        var me = this;
+        if (me.state.originalItem) {
+            Object.keys(record).forEach((key) => {
+                record[key] = me.state.originalItem[key];
+            })
+        }
+        me.setState(
+            {
+                editingKey: ''
+            }
+        );
     }
     render() {
         var me = this;
@@ -370,100 +602,179 @@ class GridTable extends React.Component {
             x: false,
             y: props.scrollheight
         } : null;
-        var columnsresize = me.state.columns.map((col, i) => ({
-            ...col,
-            render: (text, record, index) => {
-                return me.convertColumnValue(text, col.dataType);
-            },
-            ...me.getColumnSearchProps(col),
-            onHeaderCell: column => ({
-                width: column.width,
-                onResize: me.handleResize(i),
-            })
-        }));
+        var columnsresize = me.state.columns.map((col, i) => {
+            if (!col.editable) {
+                return {
+                    ...col,
+                    render: (text, record, index) => {
+                        return me.convertColumnValue(text, col.dataType);
+                    },
+                    ...me.getColumnSearchProps(col),
+                    onHeaderCell: column => ({
+                        width: column.width,
+                        onResize: me.handleResize(i),
+                    }),
+                }
+            }
+            return {
+                ...col,
+                render: (text, record, index) => {
+                    return me.convertColumnValue(text, col.dataType, col.datasource, col.memberkey, col.dataIndex);
+                },
+                ...me.getColumnSearchProps(col),
+                onHeaderCell: column => ({
+                    width: column.width,
+                    onResize: me.handleResize(i),
+                }),
+                onCell: (record) => {
+                    return ({
+                        record,
+                        datatype: col.dataType ? col.dataType : Constant.valueType.string,
+                        required: col.required,
+                        dataIndex: col.dataIndex,
+                        title: col.title,
+                        editing: me.isEditing(record),
+                        cellValueChange: me.props.cellValueChange,
+                        memberkey: col.memberkey,
+                        valuekey: col.valuekey,
+                        datasource: col.datasource
+                    })
+                }
+            }
+        }
+        );
+        if (props.allowEdit) {
+            columnsresize.push(
+                {
+                    width: 60,
+                    align: 'center',
+                    render: (_, record) => {
+                        const editable = me.isEditing(record);
+                        return editable ? (
+                            // <Button size='small' shape='round' type="primary" icon={<FileDoneOutlined />} />
+                            <Space size={15} >
+                                <Tooltip title="Cập nhật" color='blue'>
+                                    <a onClick={() => { me.save(record) }}> <FileDoneOutlined style={{ fontSize: 17 }} /></a>
+                                </Tooltip>
+                                <Tooltip title="Hủy bỏ" color='red'>
+                                    <a onClick={() => { me.cancel(record) }} > <FileExcelOutlined style={{ fontSize: 17, color: 'red' }} /></a>
+                                </Tooltip>
+                            </Space>
+                        ) : null
+                    },
+                }
+            );
+        }
         var menu = {
+            tableId: me.state.tableId,
             menu: me.props.menu
         }
         return (
             <>
-                <Table
-                    size="small"
-                    emptyText='Không có dữ liệu'
-                    onChange={me.props.onChange}
-                    onRow={(record, rowIndex) => {
-                        return {
-                            onClick: event => {
-                                me.setSelectedRow(record[props.rkey]);
-                                me.props.onRowClick(record);
-                            }, // click row
-                            onDoubleClick: event => {
-                                me.setSelectedRow(record[props.rkey]);
-                                me.props.onDbRowClick(record);
-                            }, // double click row
-                            onContextMenu: event => {
-                                event.preventDefault();
-                                var popups = document.getElementsByClassName('popup');
-                                if (popups && popups.length > 0 && popupWidth == 0) {
-                                    popupWidth = popups[0].clientWidth;
-                                    popupHeight = popups[0].clientHeight;
-                                }
-                                me.props.onRowClick(record);
-                                me.setSelectedRow(record[props.rkey]);
-                                if (!showContextMenu) {
-                                    document.addEventListener('click', function onClickOutside() {
-                                        // me.setState({ popup: { showPopup: false } })
-                                        showContextMenu = false;
-                                        if (popups[0] && popups[0].style) {
-                                            popups[0].style.display = 'none';
+                <Form ref={me.myform} component={false}>
+                    <Table
+                        size="small"
+                        id={me.state.tableId}
+                        onChange={me.props.onChange}
+                        onRow={(record, rowIndex) => {
+                            return {
+                                onClick: event => {
+                                    me.setSelectedRow(record[props.rkey]);
+                                    me.state.current = record;
+                                    if (me.props.onRowClick) {
+                                        me.props.onRowClick(record);
+                                    }
+                                }, // click row
+                                onDoubleClick: event => {
+                                    if (!props.allowEdit) {
+                                        me.setSelectedRow(record[props.rkey]);
+                                        me.state.current = record;
+                                        me.state.originalItem = { ...record };
+                                        if (me.props.onDbRowClick) {
+                                            me.props.onDbRowClick(record);
                                         }
-                                        document.removeEventListener('click', onClickOutside)
-                                    })
-                                }
-                                var rect = event.currentTarget.getBoundingClientRect()
-                                var ele = document.querySelector('.ant-table-body');
-                                var rectele = ele.getBoundingClientRect();
-                                var x = event.screenX - rect.left;
-                                //tràn sang bên phải sát quá thì show sang bên trái
-                                if (event.screenX + popupWidth > window.innerWidth) {
-                                    x = event.screenX - popupWidth - rect.left
-                                }
-                                //tràn xuống dưới sát quá thì show lên trên
-                                var y = event.screenY - rectele.top - 30
-                                if (event.screenY + popupHeight > window.innerHeight) {
-                                    y = event.screenY - rectele.top - 30 - popupHeight
-                                }
+                                    }
+                                    else if (!me.isEditing(record)) {
+                                        me.setSelectedRow(record[props.rkey]);
+                                        me.state.current = record;
+                                        me.state.originalItem = { ...record };
+                                        if (me.props.onDbRowClick) {
+                                            me.props.onDbRowClick(record);
+                                        }
+                                        if (!me.props.disabled) {
+                                            me.edit(record);
+                                        }
+                                    }
+                                }, // double click row
+                                onContextMenu: event => {
+                                    event.preventDefault();
+                                    if (me.props.menu) {
+                                        var selector = me.state.tableId + 'popup'
+                                        var popup = document.getElementById(selector);
+                                        if (popup && popupWidth == 0) {
+                                            popupWidth = popup.clientWidth;
+                                            popupHeight = popup.clientHeight;
+                                        }
+                                        if (me.props.onRowClick) {
+                                            me.props.onRowClick(record);
+                                        }
+                                        me.setSelectedRow(record[props.rkey]);
+                                        me.state.current = record;
+                                        if (!showContextMenu) {
+                                            document.addEventListener('click', function onClickOutside() {
+                                                // me.setState({ popup: { showPopup: false } })
+                                                showContextMenu = false;
+                                                if (popup && popup.style) {
+                                                    popup.style.display = 'none';
+                                                }
+                                                document.removeEventListener('click', onClickOutside)
+                                            })
+                                        }
+                                        var rect = event.currentTarget.getBoundingClientRect()
+                                        var element = document.getElementById(me.state.tableId);
+                                        var ele = element.querySelector('.ant-table-body');
+                                        var rectele = ele.getBoundingClientRect();
+                                        var x = event.screenX - rect.left;
+                                        //tràn sang bên phải sát quá thì show sang bên trái
+                                        if (event.screenX + popupWidth > window.innerWidth) {
+                                            x = event.screenX - popupWidth - rect.left
+                                        }
+                                        //tràn xuống dưới sát quá thì show lên trên
+                                        var y = event.screenY - rectele.top - 30
+                                        if (event.screenY + popupHeight > window.innerHeight) {
+                                            y = event.screenY - rectele.top - 30 - popupHeight
+                                        }
 
-                                var popup = {
-                                    record,
-                                    showPopup: true,
-                                    x,
-                                    y
-                                }
-                                popups[0].style.visibility = 'visible';
-                                popups[0].style.left = `${popup.x}px`
-                                popups[0].style.top = `${popup.y}px`
-                                popups[0].style.display = 'block';
-                                // popupHeight
-                                // me.setState({
-                                //     popup
-                                // })
-                            }, // right button click row
-                            onMouseEnter: event => { }, // mouse enter row
-                            onMouseLeave: event => { }, // mouse leave row
-                        };
-                    }}
-                    bordered
-                    rowKey={props.rkey}
-                    scroll={
-                        scroll
-                    }
-                    components={components}
-                    // defaultExpandedRowKeys={me.props.expandkeys}
-                    loading={props.isbusy}
-                    pagination={false}
-                    columns={columnsresize}
-                    dataSource={props.data} />
-                <Popup {...menu} />
+                                        var popupobj = {
+                                            record,
+                                            showPopup: true,
+                                            x,
+                                            y
+                                        }
+                                        popup.style.visibility = 'visible';
+                                        popup.style.left = `${popupobj.x}px`
+                                        popup.style.top = `${popupobj.y}px`
+                                        popup.style.display = 'block';
+                                    }
+                                }, // right button click row
+                                onMouseEnter: event => { }, // mouse enter row
+                                onMouseLeave: event => { }, // mouse leave row
+                            };
+                        }}
+                        bordered
+                        rowKey={props.rkey}
+                        scroll={
+                            scroll
+                        }
+                        components={components}
+                        // defaultExpandedRowKeys={me.props.expandkeys}
+                        loading={props.isbusy}
+                        pagination={false}
+                        columns={columnsresize}
+                        dataSource={props.data} />
+                    <Popup {...menu} />
+                </Form>
+
             </>
         )
     }

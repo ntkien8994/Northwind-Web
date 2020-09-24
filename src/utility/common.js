@@ -87,7 +87,7 @@ export function getReactLoading(props) {
     return <ReactLoading {...props} />
 }
 export function getnewid() {
-    return new uuidv4();
+    return uuidv4();
 }
 export function stringify(obj) {
     return qs.stringify(obj);
@@ -171,10 +171,38 @@ export function getFilter(filters, cols) {
 //--------------------------------
 //created by: ntkien 
 //created date: 10.09.2020
-export function formatNumber(value){
-    var result=null;
-    if(value){
-      result = numberFormat.format(value);
+export function formatNumber(value) {
+    var result = null;
+    if (value != null && value != undefined) {
+        result = numberFormat.format(value);
     }
     return result;
+}
+
+//description: Hàm convert kiểu %
+//--------------------------------
+//created by: ntkien 
+//created date: 10.09.2020
+export function formatPercent(value) {
+    var result = null;
+    if (value != null && value != undefined) {
+        result = numberFormat.format(value)+"%";
+    }
+    return result;
+}
+
+//description: Hàm lấy rowid lớn nhất
+//--------------------------------
+//created by: ntkien 
+//created date: 10.09.2020
+export function getMaxId(arr, key) {
+    var maxid = 0;
+    if (arr) {
+        arr.map(item => {
+            if (item[key] > maxid) {
+                maxid = item[key];
+            }
+        });
+    }
+    return maxid + 1;
 }

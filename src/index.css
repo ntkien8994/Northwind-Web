@@ -562,3 +562,19 @@
   align-items: flex-end;
   padding: 10px 0px 0px 0px;
 }
+
+.ant-table-cell .ant-form-item{
+  margin-bottom: 0px !important;
+}
+.ant-input-number-handler-wrap{
+  display: none;
+}
+.ant-input[disabled]{
+  cursor: text;
+}
+.ant-picker-input > input[disabled]{
+  cursor: text;
+}
+.ant-picker.ant-picker-disabled{
+  cursor: text;
+}

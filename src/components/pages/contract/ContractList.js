@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import { doAction } from '../../../actions/action';
 import ContractDetail from './ContractDetail';
 import * as Constant from '../../../utility/Constant';
+import GridTable from '../../controls/GridTable';
+import {Tabs} from 'antd';
 
+const { TabPane } = Tabs;
 const mapStateToProps = state => {
     return {
         ...state.contracts
@@ -80,6 +83,26 @@ class ContractList extends BaseList {
             }
         ]
     }
+    //description: Lấy panel chi tiết trong trường hợp có master/detail
+    //-----------------------------------------------------------------
+    //created by: ntkien 
+    //created date: 09.09.2020
+    getPanelDetail() {
+        var me = this;
+        var propsTableDetail = {
+            columns:me.getColumnsDetail(),
+            isbusy: me.props.isbusyDetail,
+            data:[...me.props.detailData]
+        }
+        return (
+            <Tabs defaultActiveKey="1" style={{ width: '100%', height: '230px' }} type="card" size='small'>
+                <TabPane tab="Chi tiết" key="1">
+                    <GridTable
+                        {...propsTableDetail} />
+                </TabPane>
+            </Tabs>
+        );
+    }
     getColumns() {
         var me = this;
         return [
@@ -131,10 +154,10 @@ class ContractList extends BaseList {
                 allowFilter: true
             },
             {
-                title: 'Ngày nhập kho',
+                title: 'Ngày hợp đồng',
                 align: 'center',
-                dataIndex: 'InputDate',
-                key: 'InputDate',
+                dataIndex: 'ContractDate',
+                key: 'ContractDate',
                 width: 150,
                 ellipsis: true,
                 dataType: Constant.valueType.datetime,
@@ -143,7 +166,10 @@ class ContractList extends BaseList {
             }
         ]
     }
-
+    getCustomParam(param){
+        var me=this;
+        param.dictionaryLoaded = me.props.dictionaryLoaded;
+    }
     getFormDetail(propsFormDetail) {
         return <ContractDetail {...propsFormDetail} />
     }

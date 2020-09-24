@@ -58,6 +58,7 @@ export function customers(state = initState, action) {
             break;
         case Constant.CustomerAction.CLOSE_FORM:
             result.showDetail = false;
+            result.editMode=Constant.editMode.none;
             break;
         case Constant.CustomerAction.LOAD_INFO:
             result.loadingDetailForm = true;
@@ -77,6 +78,7 @@ export function customers(state = initState, action) {
             result.loadingDetailForm = false;
             result.showDetail = false;
             result.saveComplete = true;
+            result.editMode=Constant.editMode.none;
             result.response = action.param.response;
             break;
     }

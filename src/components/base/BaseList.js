@@ -5,7 +5,7 @@ import * as common from '../../utility/common';
 import { Pagination, Menu, message, Modal, Tabs } from 'antd';
 import BaseComponent from './BaseComponent';
 import GridTable from '../controls/GridTable';
-import {FileSearchOutlined , PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircleFilled,FileAddOutlined,FormOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, PlusCircleFilled, EditFilled, DeleteFilled, SyncOutlined, QuestionCircleFilled, FileAddOutlined, FormOutlined } from '@ant-design/icons';
 const { TabPane } = Tabs;
 
 class BaseList extends BaseComponent {
@@ -79,6 +79,9 @@ class BaseList extends BaseComponent {
                 break;
             case Constant.commandName.refresh:
                 me.refresh();
+                break;
+            case Constant.commandName.view:
+                me.showFormDetail(Constant.editMode.none, me.props.id, me.props.current);
                 break;
             case Constant.commandName.export:
                 break;
@@ -161,11 +164,13 @@ class BaseList extends BaseComponent {
     //created by: ntkien 
     //created date: 01.09.2020
     getToolBarConfig() {
+        var me = this;
+        var disabled = (!me.props.data || me.props.data == 0);
         return ([
-            { commandName: Constant.commandName.add, value: "Thêm mới", icon: <FileAddOutlined  style={{ color: '#52c41a' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.view,hideIfNotMaster:true, disableWhenZero: true, value: "Xem", icon: <FileSearchOutlined  style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.edit, disableWhenZero: true, value: "Sửa", icon: <FormOutlined  style={{ color: '#1890ff' }} />, sortOrder: 0 },
-            { commandName: Constant.commandName.delete, disableWhenZero: true, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.add, value: "Thêm mới", icon: <FileAddOutlined style={{ color: '#52c41a' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.view, hide: (!me.props.isMasterDetail), disabled: disabled, value: "Xem", icon: <FileSearchOutlined style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.edit, disabled: disabled, value: "Sửa", icon: <FormOutlined style={{ color: '#1890ff' }} />, sortOrder: 0 },
+            { commandName: Constant.commandName.delete, disabled: disabled, value: "Xóa", icon: <DeleteFilled style={{ color: 'red' }} />, sortOrder: 0 },
             { commandName: Constant.commandName.refresh, value: "Làm mới", icon: <SyncOutlined style={{ color: '#52c41a' }} />, seperator: true, sortOrder: 3 },
             { commandName: Constant.commandName.help, value: "Trợ giúp", icon: <QuestionCircleFilled style={{ color: '#1890ff' }} />, sortOrder: 4 },
         ]);
@@ -237,23 +242,10 @@ class BaseList extends BaseComponent {
     //created date: 09.09.2020
     getPanelDetail() {
         var me = this;
-        // var propsTable = {
-        //     rkey: key,
-        //     scrollheight,
-        //     columns,
-        //     isbusy: me.props.isbusy,
-        //     data: me.props.data,
-        //     activeFirstRow: me.props.activeFirstRow
-        // }
         return (
-            <Tabs defaultActiveKey="1" style={{width:'100%',height:'230px'}} type="card" size='small'>
+            <Tabs defaultActiveKey="1" style={{ width: '100%', height: '230px' }} type="card" size='small'>
                 <TabPane tab="Chi tiết" key="1">
-                    <GridTable
-                        columns={me.getColumnsDetail()}
-                    />
-                </TabPane>
-                <TabPane tab="Chi tiết 2" key="2">
-                    Chi tiết 2
+                    Chi tiết
                 </TabPane>
             </Tabs>
         );
@@ -282,13 +274,15 @@ class BaseList extends BaseComponent {
         var me = this;
         var { saveComplete, response } = me.props;
         if (saveComplete) {
-            if (response && response.data == '1') {
+            if (response &&response.success && response.data && response.data != '0') {
                 message.success(Constant.SAVE_SUCCESS);
             }
             else {
                 message.error(Constant.SAVE_FAIL);
             }
-            me.refresh();
+            if (!(me.props.saveComplete && me.props.editMode == Constant.editMode.add)) {
+                me.refresh();
+            }
         }
     }
 
@@ -335,6 +329,10 @@ class BaseList extends BaseComponent {
     componentDidUpdate() {
         var me = this;
         me.showNotifyAfterSave();
+        //nếu đóng form chi tiết và cần refresh thì load lại data
+        if (me.props.forceRefresh && !me.props.showDetail) {
+            me.refresh();
+        }
     }
     window_resize = () => {
         var me = this;
@@ -381,23 +379,23 @@ class BaseList extends BaseComponent {
         var propsFormDetail = {
             showDetail: me.props.showDetail
         }
-        
+
         var detailForm = me.getFormDetail(propsFormDetail);
         return (
             <React.Fragment>
                 {me.getSearchPanel()}
                 {
-                    toobarConfig ? <BaseToolBar isMasterDetail={me.props.isMasterDetail} data={me.props.data} config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
+                    toobarConfig ? <BaseToolBar isMasterDetail={me.props.isMasterDetail} config={toobarConfig} clickCallBack={me.toolbar_Click} /> : null
                 }
-                <div className={me.props.isMasterDetail?'master-table':'dictionary-table'}>
+                <div className={me.props.isMasterDetail ? 'master-table' : 'dictionary-table'}>
                     <GridTable
-                    onChange={me.handleTableChange}
-                    onRowClick={me.onRowClick}
-                    onDbRowClick={me.onDbRowClick}
-                    menu={me.getContextMenu()}
-                    {...propsTable} />
+                        onChange={me.handleTableChange}
+                        onRowClick={me.onRowClick}
+                        onDbRowClick={me.onDbRowClick}
+                        menu={me.getContextMenu()}
+                        {...propsTable} />
                 </div>
-                
+
                 <div className='box-pagination'>
                     <Pagination
                         size="small"

@@ -38,7 +38,7 @@ class ProductList extends BaseList {
                 ellipsis: true,
                 sorter: true,
                 fixed:'left',
-                allowFilter:true
+                allowFilter:true,
             },
             {
                 title: 'Giá',

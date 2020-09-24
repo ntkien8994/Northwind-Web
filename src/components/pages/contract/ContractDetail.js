@@ -7,6 +7,7 @@ import * as Constant from '../../../utility/Constant';
 import LabelForm from '../../controls/LabelForm';
 import GridTable from '../../controls/GridTable';
 import { PlusOutlined, LineOutlined } from '@ant-design/icons';
+import * as common from '../../../utility/common';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -28,68 +29,36 @@ const mapDispatchToProps = dispatch => {
 class ContractDetail extends BaseMasterDetail {
     constructor(props) {
         super(props);
+        this.grd = React.createRef();
     }
 
-    getColumnsDetail() {
+    acceptChange = (record) => {
         var me = this;
-        return [
-            {
-                title: 'Tên hàng hóa',
-                dataIndex: 'ProductName',
-                key: 'ProductName',
-                width: 200,
-                ellipsis: true,
-            },
-            {
-                title: 'Số lượng',
-                dataIndex: 'Quantity',
-                key: 'Quantity',
-                width: 80,
-                ellipsis: true,
-                align: 'right',
-                dataType: Constant.valueType.int,
-            },
-            {
-                title: 'Đơn giá',
-                dataIndex: 'UnitPrice',
-                key: 'UnitPrice',
-                width: 100,
-                ellipsis: true,
-                align: 'right',
-                dataType: Constant.valueType.decimal,
-            },
-            {
-                title: 'Thành tiền',
-                dataIndex: 'Amount',
-                key: 'Amount',
-                width: 110,
-                ellipsis: true,
-                align: 'right',
-                dataType: Constant.valueType.decimal,
-            },
-            {
-                title: '% Khuyến mại',
-                dataIndex: 'PromotionRate',
-                key: 'PromotionRate',
-                width: 100,
-                ellipsis: true,
-                align: 'right',
-                dataType: Constant.valueType.decimal,
-            },
-            {
-                title: 'Tổng tiền',
-                dataIndex: 'TotalAmount',
-                key: 'TotalAmount',
-                width: 110,
-                ellipsis: true,
-                align: 'right',
-                dataType: Constant.valueType.decimal,
-            }
-        ]
+        record.UnitPrice = record.UnitPrice;
+        record.Amount = record.Quantity * record.UnitPrice;
+        record.TotalAmount = record.Quantity * record.UnitPrice - record.Amount * record.PromotionRate / 100;
+        me.grd.current.updateGrid();
+    }
+    disableControl(){
+        var me=this;
+        me.grd.current.updateGridToView();
     }
     getForm() {
         var me = this;
+        var isViewMode = (me.props.editMode === Constant.editMode.none);
+        var disableDeleteRow = (me.props.detailData && me.props.detailData.length > 0) ? false : true;
+
         var customers = me.props.customers ? me.props.customers : [];
+        var details = me.props.detailData.filter(x => !(x.EditMode && x.EditMode === Constant.entityEditMode.delete));
+        var propsTable = {
+            columns: me.getColumnsDetail(),
+            data: details ? [...details] : [],
+            scrollheight: 160,
+            rkey: "RowId",
+            allowEdit: true,
+            disabled:  isViewMode ,
+            acceptChange: me.acceptChange
+        }
         return (
             <>
                 <Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
@@ -111,7 +80,7 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <Input />
+                            <Input disabled={isViewMode} />
                         </Form.Item>
                     </Col>
                     <Col span={3}>
@@ -127,7 +96,7 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <DatePicker style={{ width: '100%' }} format={Constant.FORMAT_DATE} />
+                            <DatePicker disabled={isViewMode} style={{ width: '100%' }} format={Constant.FORMAT_DATE} />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -150,11 +119,10 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <Input />
+                            <Input disabled={isViewMode} />
                         </Form.Item>
                     </Col>
                 </Row>
-
                 <Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
                     <Col span={3}>
                         <LabelForm >Số điện thoại</LabelForm>
@@ -170,7 +138,7 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <Input />
+                            <Input disabled={isViewMode} />
                         </Form.Item>
                     </Col>
                     <Col span={3}>
@@ -187,11 +155,10 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <Input />
+                            <Input disabled={isViewMode} />
                         </Form.Item>
                     </Col>
                 </Row>
-
                 <Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
                     <Col span={3}>
                         <LabelForm>Khách hàng</LabelForm>
@@ -200,7 +167,7 @@ class ContractDetail extends BaseMasterDetail {
                         <Form.Item
                             name="CustomerId"
                         >
-                            <Select allowClear
+                            <Select disabled={isViewMode} allowClear
                                 showSearch
                                 filterOption={(input, option) =>
                                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -228,7 +195,7 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <Input />
+                            <Input disabled={isViewMode} />
                         </Form.Item>
                     </Col>
                     <Col span={3}>
@@ -245,34 +212,140 @@ class ContractDetail extends BaseMasterDetail {
                                 }
                             ]}
                         >
-                            <Input />
+                            <Input disabled={isViewMode} />
                         </Form.Item>
                     </Col>
                 </Row>
                 <Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
-                    <Tabs defaultActiveKey="1" style={{ width: '100%', height: '230px' }} type="card" size='small'>
+                    <Tabs defaultActiveKey="1" style={{ width: '100%', height: '250px' }} type="card" size='small'>
 
                         <TabPane tab="Chi tiết" key="1">
-                            <div style={{
-                                borderLeft: '1px solid #ddd',
-                                borderBottom: '1px solid #ddd',
-                            }}>
-                                <GridTable
-                                    columns={me.getColumnsDetail()}
-                                />
-                            </div>
+                            <GridTable
+
+                                ref={me.grd}
+                                {...propsTable}
+                            />
                         </TabPane>
                     </Tabs>
                 </Row>
                 <div className='cls-fn-detail'>
                     <Space>
-                        <Button type="primary" style={{ backgroundColor: '#52c41a' }} icon={<PlusOutlined />} size='small' >Thêm</Button>
-                        <Button type="primary" danger icon={<LineOutlined />} size='small' >Xóa</Button>
+                        <Button disabled={isViewMode} type="primary" onClick={me.addNewRow} style={{ backgroundColor: isViewMode ? '#ddd' : '#52c41a' }} icon={<PlusOutlined />} size='small' >Thêm</Button>
+                        <Button disabled={disableDeleteRow || isViewMode} type="primary" onClick={me.deleteRow} danger icon={<LineOutlined />} size='small' >Xóa</Button>
                     </Space>
-
                 </div>
             </>
         )
+    }
+    getDetailDataForSave(){
+        var me=this;
+        return [
+            {
+                TableName:'ContractDetail',
+                Value:me.props.detailData
+            }
+        ]
+    }
+    addNewRow = () => {
+        var me = this;
+        var param = me.initNewRow();
+
+        me.props.doAction(Constant.ContractAction.ADD_ROW, param);
+        if (me.grd && me.grd.current) {
+            me.grd.current.focusRow(param)
+        }
+    }
+    deleteRow = () => {
+        var me = this;
+        var param = me.grd.current.getCurrent();
+        if (param) {
+            me.props.doAction(Constant.ContractAction.DELETE_ROW, param);
+        }
+        var details = me.props.detailData.filter(x => x.RowId != param.RowId);
+        if (me.grd && me.grd.current && details.length > 0) {
+            me.grd.current.setCurrent(details[0]);
+        }
+    }
+    getColumnsDetail() {
+        var me = this;
+        return [
+            {
+                title: 'Tên hàng hóa',
+                dataIndex: 'ProductId',
+                key: 'ProductId',
+                width: 200,
+                ellipsis: true,
+                editable: true,
+                required: true,
+                valuekey: 'ProductId',
+                memberkey: 'ProductName',
+                datasource: me.props.products
+            },
+            {
+                title: 'Số lượng',
+                dataIndex: 'Quantity',
+                key: 'Quantity',
+                width: 80,
+                ellipsis: true,
+                align: 'right',
+                editable: true,
+                dataType: Constant.valueType.int,
+            },
+            {
+                title: 'Đơn giá',
+                dataIndex: 'UnitPrice',
+                key: 'UnitPrice',
+                width: 100,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+                editable: true
+            },
+            {
+                title: 'Thành tiền',
+                dataIndex: 'Amount',
+                key: 'Amount',
+                width: 110,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+            },
+            {
+                title: '% Khuyến mại',
+                dataIndex: 'PromotionRate',
+                key: 'PromotionRate',
+                width: 100,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.percent,
+                editable: true
+            },
+            {
+                title: 'Tổng tiền',
+                dataIndex: 'TotalAmount',
+                key: 'TotalAmount',
+                width: 110,
+                ellipsis: true,
+                align: 'right',
+                dataType: Constant.valueType.decimal,
+            }
+        ]
+    }
+    initNewRow() {
+        var me = this;
+        return {
+            RowId: common.getMaxId(me.props.detailData, 'RowId'),
+            ContractDetailId: common.getnewid(),
+            ContractId: me.props.masterData[me.props.primaryKey],
+            ProductId: null,
+            ProductName: 'a',
+            UnitPrice: 0,
+            Quantity: 0,
+            Amount: 0,
+            PromotionRate: 0,
+            TotalAmount: 0,
+            EditMode: Constant.entityEditMode.add
+        }
     }
 
 }

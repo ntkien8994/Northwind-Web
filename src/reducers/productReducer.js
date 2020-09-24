@@ -58,6 +58,7 @@ export function products(state = initState, action) {
             break;
         case Constant.ProductAction.CLOSE_FORM:
             result.showDetail = false;
+            result.editMode=Constant.editMode.none;
             break;
         case Constant.ProductAction.LOAD_INFO:
             result.loadingDetailForm = true;
@@ -77,6 +78,7 @@ export function products(state = initState, action) {
             result.loadingDetailForm = false;
             result.showDetail = false;
             result.saveComplete = true;
+            result.editMode=Constant.editMode.none;
             result.response = action.param.response;
             break;
     }
