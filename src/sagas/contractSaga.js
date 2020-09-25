@@ -4,6 +4,7 @@ import { doAction } from '../actions/action';
 import * as api from '../apis/apibase';
 import * as productapi from '../apis/productapi';
 import * as customerapi from '../apis/customerapi';
+import * as contractapi from '../apis/contractapi';
 
 const csContractId='ContractId';
 const csContractDetail='ContractDetail';
@@ -37,7 +38,7 @@ function* loadData(action) {
     var data = JSON.parse(result.data.data);
     var detailData=[];
     if(data && data.Data && data.Data.length>0){
-        var resDetail = yield call(() => api.getDetailByMasterId(data.Data[0][csContractId], csContractDetail,csContractId));
+        var resDetail = yield call(() => contractapi.getDetailByMasterId(data.Data[0][csContractId], csContractDetail,csContractId));
         detailData = JSON.parse(resDetail.data.data);
     }
     pagination.total = data.TotalCount;
@@ -66,7 +67,7 @@ function* loadInfo(action) {
     var id = (param && param.editMode == Constant.editMode.add) ? Constant.GUID_EMPTY : param.id;
     var result = yield call(() => api.getById(id, param.entity));
     var data = JSON.parse(result.data.data);
-    var resDetail = yield call(() => api.getDetailByMasterId(id, csContractDetail,csContractId));
+    var resDetail = yield call(() => contractapi.getDetailByMasterId(id, csContractDetail,csContractId));
     var detailData = JSON.parse(resDetail.data.data);
     var index = 0;
     if(detailData&&detailData.length>0){
@@ -102,7 +103,7 @@ function* saveData(action) {
 
 function* loadDetail(action) {
     var { param } = action;
-    var resDetail = yield call(() => api.getDetailByMasterId(param.record.ContractId, csContractDetail,csContractId));
+    var resDetail = yield call(() => contractapi.getDetailByMasterId(param.record.ContractId, csContractDetail,csContractId));
     var detailData = JSON.parse(resDetail.data.data);
     yield put(doAction(Constant.ContractAction.SELECTED_CHANGE_COMPLETE, {detailData }));
 }

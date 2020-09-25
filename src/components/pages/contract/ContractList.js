@@ -70,7 +70,7 @@ class ContractList extends BaseList {
                 width: 150,
                 ellipsis: true,
                 align: 'right',
-                dataType: Constant.valueType.decimal,
+                dataType: Constant.valueType.percent,
             },
             {
                 title: 'Tổng tiền',
